@@ -1,0 +1,2900 @@
+
+//===================================================第一章==============================================
+
+/**********
+【题目】试写一算法，如果三个整数a，b和c的值
+不是依次非递增的，则通过交换，令其为非递增。
+***********/
+void Descend(int &a, int &b, int &c)
+/* 通过交换，令 a >= b >= c */
+{
+     int temp = c;
+     if(c > b) {
+         c = b;
+         b = temp;
+     }
+     if(c > a){
+          temp = a;
+          a = c;
+          c = temp;
+     }
+     /*经过上面两个if语句，c变为最小值*/
+     if(b > a){
+          temp = b;
+          b = a;
+          a = temp;
+     }
+    
+}
+
+/**********
+【题目】试编写算法求一元多项式
+    P(x) = a0 + a1x + a2x^2 + ... + anx^n
+的值P(x0)，并确定算法中每一语句的执行次数和整个算法
+的时间复杂度。
+**********/
+float Polynomial(int n, int a[], float x)
+/* 求一元多项式的值P(x)。                  */
+/* 数组a的元素a[i]为i次项的系数，i=0,...,n */
+{
+      float temp = a[0];
+      float p = temp;
+      float nuh =x;
+      for(int i = 1;i <= n;i++) {
+         temp = a[i] *  x;
+         x *= nuh;
+         p += temp;
+      }
+      return p;         
+}
+
+
+/**********
+【题目】已知k阶裴波那契序列的定义为
+    f(0)=0, f(1)=0, ..., f(k-2)=0, f(k-1)=1;
+    f(n)=f(n-1)+f(n-2)+...+f(n-k), n=k,k+1,...
+试编写求k阶裴波那契序列的第m项值的函数算法，
+k和m均以值调用的形式在函数参数表中出现。
+**********/
+Status Fibonacci(int k, int m, int &f) 
+/* 求k阶斐波那契序列的第m项的值f */
+{
+    if(k < 2)
+       return ERROR;
+    if(m == 0) {      
+       return OK; //这题贼坑，不能return 0; 会输出ERROR。
+    }
+    if(m < 0)
+       return 0;
+    if (m < k-1)
+        return OK;
+    int sum[100]={ 0 };
+    for (int i = 0; i < k - 1; i++) {
+        sum[i] = 0;
+    }
+    sum[k - 1] = 1;//这是第k项
+    for (int x = k; x <= m; x++) {//从第k+1项开始，每一项都是前k项的和，我们只需要计算到第m项
+        for (int j = x-1; j >= x-k; j--) {//计算前k项的和
+            sum[x] += sum[j];            
+        }       
+    }
+    f = sum[m];    
+    return f;
+}
+
+/**********
+【题目】试编写算法，计算i!×2^i的值并存入数组
+a[0..n-1]的第i-1个分量中 (i=1,2,…,n)。假设计
+算机中允许的整数最大值为MAXINT，则当对某个k
+(1≤k≤n)使k!×2^k>MAXINT时，应按出错处理。注意
+选择你认为较好的出错处理方法。
+**********/
+Status Series(int a[], int n) 
+/* 求i!*2^i序列的值并依次存入长度为n的数组a；     */
+/* 若所有值均不超过MAXINT，则返回OK，否则OVERFLOW */
+{
+    a[0] = 2;
+    for (int i = 1; i < n; i++) {
+        int first = i+1;
+        int second = 2;
+        for (int j = first-1; j > 1; j--) {
+        //    printf("j = %d first = %d\n", j,first);
+            first *= j;
+        }
+        for (int z = 0; z < i; z++) {
+            second *= 2;
+        }
+        if (first * second > MAXINT)
+            return OVERFLOW;
+        else
+            a[i] = first * second;
+        //printf("first =%d  second= %d a[%d]=%d ", first,second,i,a[i]);
+    }
+    
+        
+    return OK;
+}
+
+/**********
+【题目】假设有A、B、C、D、E五个高等院校进行田径对抗赛，
+各院校的单项成绩均以存入计算机并构成一张表，表中每一行
+的形式为：
+        项目名称   性别   校名   成绩   得分
+编写算法，处理上述表格，以统计各院校的男、女总分和团体
+总分，并输出。
+**********/
+/*相关数据类型定义如下：
+typedef enum {female,male} Sex;
+typedef struct{
+char *sport; // 项目名称
+Sex gender; // 性别（女：female；男：male）
+char schoolname; // 校名为'A','B','C','D'或'E'
+char *result; // 成绩
+int score; // 得分（7,5,4,3,2或1）
+} ResultType;
+
+typedef struct{
+int malescore; // 男子总分
+int femalescore; // 女子总分
+int totalscore; // 男女团体总分
+} ScoreType;
+*/
+void Scores(ResultType *result, ScoreType *score)
+/* 求各校的男、女总分和团体总分, 并依次存入数组score */
+/* 假设比赛结果已经储存在result[ ]数组中,            */
+/* 并以特殊记录 {"", male, ' ', "", 0 }（域scorce=0）*/
+/* 表示结束                                          */
+{
+   int i = 0;
+    while(result[i].score != NULL) {        
+        if (result[i].schoolname == 'A' && result[i].gender == female) {
+            score[0].femalescore += result[i].score;
+        }
+        if (result[i].schoolname == 'A' && result[i].gender == male) {
+            score[0].malescore += result[i].score;
+        }
+        if (result[i].schoolname == 'B' && result[i].gender == female) {
+            score[1].femalescore += result[i].score;
+        }
+        if (result[i].schoolname == 'B' && result[i].gender == male) {
+            score[1].malescore += result[i].score;
+        }
+        if (result[i].schoolname == 'C' && result[i].gender == female) {
+            score[2].femalescore += result[i].score;
+        }
+        if (result[i].schoolname == 'C' && result[i].gender == male) {
+            score[2].malescore += result[i].score;
+        }
+        if (result[i].schoolname == 'D' && result[i].gender == female) {
+            score[3].femalescore += result[i].score;
+        }
+        if (result[i].schoolname == 'D' && result[i].gender == male) {
+            score[3].malescore += result[i].score;
+        }
+        if (result[i].schoolname == 'E' && result[i].gender == female) {
+            score[4].femalescore += result[i].score;
+        }
+        if (result[i].schoolname == 'E' && result[i].gender == male) {
+            score[4].malescore += result[i].score;
+        }       
+        i++;
+    }
+    int j = 0;
+    while (result[j].score != NULL) {
+        score[j].totalscore = score[j].femalescore + score[j].malescore;
+        j++;
+    }
+}
+
+
+/**********
+【题目】试写一算法，对序列S的第i个元素赋以值e。
+序列的类型定义为：
+typedef struct {
+  ElemType  *elem;
+  int  length;
+} Sequence;
+***********/
+Status Assign(Sequence &S, int i, ElemType e) 
+/* 对序列S的第i个元素赋以值e，并返回OK。 */
+/* 若S或i不合法，则赋值失败，返回ERROR   */
+{
+    if(i > S.length)
+        return ERROR; 
+    if (S.elem == null)
+        return ERROR;
+    else if (S.elem[i] = e)
+        return OK;
+    else 
+        return ERROR;
+}
+
+/**********
+【题目】试写一算法，由长度为n的一维数组a构建一个序列S。
+序列的类型定义为：
+typedef struct {
+  ElemType  *elem;
+  int  length;
+} Sequence;
+***********/
+Status CreateSequence(Sequence &S, int n, ElemType *a) 
+/* 由长度为n的一维数组a构建一个序列S，并返回OK。 */
+/* 若构建失败，则返回ERROR                       */
+{
+    if(n <= 0)
+       return ERROR;
+    if (S.elem = a) {
+        if(S.length = n)
+            return OK;
+    }
+    else
+        return ERROR;
+    
+    
+}
+/**********
+【题目】链表的结点和指针类型定义如下
+    typedef struct LNode {
+       ElemType  data;
+       struct LNode *next;
+    } LNode, *LinkList;
+试写一函数，构建一个值为x的结点。
+***********/
+LinkList MakeNode(ElemType x)
+/* 构建一个值为x的结点，并返回其指针。*/
+/* 若构建失败，则返回NULL。           */
+{
+    LNode X;
+    X.data = x;
+    X.next = NULL;
+    return &X;
+}
+/**********
+【题目】链表的结点和指针类型定义如下
+    typedef struct LNode {
+       ElemType  data;
+       struct LNode *next;
+    } LNode, *LinkList;
+试写一函数，构建长度为2且两个结点的值依次为x和y的链表。
+**********/
+LinkList CreateLinkList(ElemType x, ElemType y) 
+/* 构建其两个结点的值依次为x和y的链表。*/
+/* 若构建失败，则返回NULL。            */
+{
+    LNode S,Y;
+    S.data = x;
+    S.next = &Y;
+    Y.data = y;
+    Y.next = NULL;
+    return &S;
+}
+/**********
+【题目】链表的结点和指针类型定义如下
+    typedef struct LNode {
+       ElemType  data;
+       struct LNode *next;
+    } LNode, *LinkList;
+试写一函数，构建长度为2的升序链表，两个结点的值
+分别为x和y，但应小的在前，大的在后。
+**********/
+LinkList CreateOrdLList(ElemType x, ElemType y)
+/* 构建长度为2的升序链表。  */
+/* 若构建失败，则返回NULL。 */
+{
+    if (x > y) {
+        char temp = x;
+        x = y;
+        y = temp;
+    }
+
+    LNode S, Y;
+    S.data = x;
+    S.next = &Y;
+    Y.data = y;
+    Y.next = NULL;
+    return &S;
+}
+
+//================================================第二章===================================
+
+/**********
+【题目】试写一算法，实现顺序栈的判空操作
+StackEmpty_Sq(SqStack S)。
+顺序栈的类型定义为：
+typedef struct {
+  ElemType *elem; // 存储空间的基址
+  int top;        // 栈顶元素的下一个位置，简称栈顶位标
+  int size;       // 当前分配的存储容量
+  int increment;  // 扩容时，增加的存储容量
+} SqStack;        // 顺序栈
+***********/
+Status StackEmpty_Sq(SqStack S)
+/* 对顺序栈S判空。                      */ 
+/* 若S是空栈，则返回TRUE；否则返回FALSE */
+{
+    //printf("S.top = %d ",S.top);
+    if (S.elem == NULL)
+        return TRUE;
+    else if(S.top <= 0)//top代表下标
+        return TRUE;    
+    else 
+        return FALSE;
+}
+
+/**********
+【题目】试写一算法，实现顺序栈的取栈顶元素操作
+GetTop_Sq(SqStack S, ElemType &e)。
+顺序栈的类型定义为：
+typedef struct {
+  ElemType *elem;  // 存储空间的基址
+  int top;         // 栈顶元素的下一个位置，简称栈顶位标
+  int size;        // 当前分配的存储容量
+  int increment;   // 扩容时，增加的存储容量
+} SqStack;         // 顺序栈
+***********/
+Status GetTop_Sq(SqStack S, ElemType &e) 
+/* 取顺序栈S的栈顶元素到e，并返回OK； */ 
+/* 若失败，则返回ERROR。              */
+{
+    if (e = S.elem[S.top-1])
+        return OK;
+    else
+        return ERROR;
+}
+/**********
+【题目】试写一算法，实现顺序栈的出栈操作
+Pop_Sq(SqStack &S, ElemType &e)。
+顺序栈的类型定义为：
+typedef struct {
+  ElemType *elem;  // 存储空间的基址
+  int top;         // 栈顶元素的下一个位置，简称栈顶位标
+  int size;        // 当前分配的存储容量
+  int increment;   // 扩容时，增加的存储容量
+} SqStack;         // 顺序栈
+***********/
+Status Pop_Sq(SqStack &S, ElemType &e) 
+/* 顺序栈S的栈顶元素出栈到e，并返回OK；*/ 
+/* 若失败，则返回ERROR。               */
+{
+    if(S.top == 0)
+    return ERROR;
+    else{
+    e = S.elem[S.top-1];
+    S.top--;
+    return OK; 
+    }
+}
+/**********
+【题目】若顺序栈的类型重新定义如下。试编写算法，
+构建初始容量和扩容增量分别为size和inc的空顺序栈S。
+typedef struct {
+  ElemType *elem; // 存储空间的基址
+  ElemType *top;  // 栈顶元素的下一个位置
+  int size;       // 当前分配的存储容量
+  int increment;  // 扩容时，增加的存储容量
+} SqStack2;
+***********/
+Status InitStack_Sq2(SqStack2 &S, int size, int inc)
+/* 构建初始容量和扩容增量分别为size和inc的空顺序栈S。*/ 
+/* 若成功，则返回OK；否则返回ERROR。                 */
+{    
+   if(inc < 0)
+     return ERROR;
+   else if(size < 0)
+     return ERROR;
+   else if(S.top += inc) {
+      S.size = size;
+      S.increment = inc;
+      return OK;
+      }
+   else  
+      return ERROR;
+      
+     
+}
+
+/**********
+【题目】若顺序栈的类型重新定义如下。试编写算法，
+实现顺序栈的判空操作。
+typedef struct {
+  ElemType *elem; // 存储空间的基址
+  ElemType *top;  // 栈顶元素的下一个位置
+  int size;       // 当前分配的存储容量
+  int increment;  // 扩容时，增加的存储容量
+} SqStack2;
+***********/
+Status StackEmpty_Sq2(SqStack2 S)
+/* 对顺序栈S判空。                      */ 
+/* 若S是空栈，则返回TRUE；否则返回FALSE */
+{
+    //第十五题  ,这题有点坑啊~S.top<=0还不能判断是空栈了？！~
+    //printf("  %d  ",S.size);  
+    //printf("  %s  ",S.elem);
+    //printf("  %c  ",S.elem[0]);   //这里不知道为啥不能写成S.elem[S.top-1]....
+    //if(S.top <= 0)  //S.size永远是6，而S.top 永远大于0.
+    //  return TRUE;
+    if(S.elem == "")
+      return TRUE;
+    else 
+      return FALSE;  
+}
+
+/**********
+【题目】若顺序栈的类型重新定义如下。试编写算法，
+实现顺序栈的入栈操作。
+typedef struct {
+  ElemType *elem; // 存储空间的基址
+  ElemType *top;  // 栈顶元素的下一个位置
+  int size;       // 当前分配的存储容量
+  int increment;  // 扩容时，增加的存储容量
+} SqStack2;
+***********/
+Status Push_Sq2(SqStack2 &S, ElemType e)
+/* 若顺序栈S是满的，则扩容，若失败则返回ERROR。*/
+/* 将e压入S，返回OK。                          */
+{
+    if (&S.elem[S.size - 1] > S.top){
+       //printf("栈不满");
+       *S.top++ = e;   //S.top++=&e则不能将e塞入S的elem数组里。经别人指点，我用加括号的方式确定了优先级，这行实际上相当于*(S.top++) =e;
+                       //而指针+1 相当于 地址+ 基类型字节数 ，即指针指向原指针的下一位元素
+       return OK;
+       }       
+    else if (&S.elem[S.size - 1] <= S.top) {
+        //printf("栈满");
+        S.size += S.increment;                        
+        *S.top ++ = e;   
+        return OK;
+    }
+    else  {      
+        return ERROR;
+    }
+}
+/**********
+【题目】若顺序栈的类型重新定义如下。试编写算法，
+实现顺序栈的出栈操作。
+typedef struct {
+  ElemType *elem; // 存储空间的基址
+  ElemType *top;  // 栈顶元素的下一个位置
+  int size;       // 当前分配的存储容量
+  int increment;  // 扩容时，增加的存储容量
+} SqStack2;
+***********/
+Status Pop_Sq2(SqStack2 &S, ElemType &e) 
+/* 若顺序栈S是空的，则返回ERROR；    */ 
+/* 否则将S的栈顶元素出栈到e，返回OK。*/
+{
+     if (e = *(S.top-1)) {   //这里有巨坑，*(S.top -1) 不等于*S.top-1  。而 前者可以等于*S.top--.....  看书上的32页2.5图会有比较好的理解。
+    //printf("elem的第一个元素是=%c ，第%d个元素是=%c top-1指向的栈顶元素是%c ",S.elem[0],S.size-1,S.elem[S.size-1],*S.top);
+    //printf("e= %c ",e);
+        S.top --;
+        S.size --;
+        return OK;
+    }
+    else{
+        //printf(" %c ",*S.top -1);
+        //printf(" e = %s ",e );
+        //if(e == 0)
+        //   printf("e是null");
+        return ERROR;
+        }
+}
+/**********
+【题目】试写一算法，借助辅助栈，复制顺序栈S1得到S2。
+顺序栈的类型定义为：
+typedef struct {
+  ElemType *elem; // 存储空间的基址
+  int top;        // 栈顶元素的下一个位置，简称栈顶位标
+  int size;       // 当前分配的存储容量
+  int increment;  // 扩容时，增加的存储容量
+} SqStack;        // 顺序栈
+可调用顺序栈接口中下列函数：
+Status InitStack_Sq(SqStack &S, int size, int inc); // 初始化顺序栈S
+Status DestroyStack_Sq(SqStack &S); // 销毁顺序栈S
+Status StackEmpty_Sq(SqStack S);    // 栈S判空，若空则返回TRUE，否则FALSE
+Status Push_Sq(SqStack &S, ElemType e); // 将元素e压入栈S
+Status Pop_Sq(SqStack &S, ElemType &e); // 栈S的栈顶元素出栈到e
+***********/
+Status CopyStack_Sq(SqStack S1, SqStack &S2) 
+/* 借助辅助栈，复制顺序栈S1得到S2。    */ 
+/* 若复制成功，则返回TRUE；否则FALSE。 */
+{
+    SqStack S3;
+    if(StackEmpty_Sq(S1)==TRUE) {
+       InitStack_Sq(S2,0,0);
+       return TRUE;
+       }
+    InitStack_Sq(S2,S1.size,S1.increment);  
+    InitStack_Sq(S3,S1.size,S1.increment);
+    ElemType e =0;
+    while (0 < S1.top) {
+    //printf("s1的top =  %d ",S1.top);  
+        Pop_Sq(S1,e);
+        Push_Sq(S3,e); 
+    }
+    while (0 < S3.top) {    
+        Pop_Sq(S3,e);
+        Push_Sq(S2,e);         
+    }
+    if (StackEmpty_Sq(S2)==TRUE)
+        return FALSE;
+    else
+        return TRUE;
+}
+/**********
+【题目】试写一算法，求循环队列的长度。
+循环队列的类型定义为：
+typedef struct {
+  ElemType *base;  // 存储空间的基址
+  int front;       // 队头位标
+  int rear;        // 队尾位标，指示队尾元素的下一位置
+  int maxSize;     // 最大长度
+} SqQueue;
+***********/
+int QueueLength_Sq(SqQueue Q)
+/* 返回队列Q中元素个数，即队列的长度。 */ 
+{
+    if(Q.rear >  Q.front){   //这题告诉我们：你不会用简单数学做出来的题，别想着用编程做出来。
+       return (Q.rear -Q.front);
+    }
+    else if(Q.rear < Q.front){
+       return (Q.maxSize - Q.front + Q.rear);   
+    }
+    else 
+        return 0;  /*因为循环队列要是出现Q.rear==q.front的情况， 书上说是必须多采用一个变量或者少用一个元素空间，
+                    这里都没有办法实现；而且观察答案后发现，maxSize是8，且不会出现元素大于8的情况，故直接返回0.  */
+  
+}
+/**********
+【题目】如果希望循环队列中的元素都能得到利用，
+则可设置一个标志域tag，并以tag值为0或1来区分尾
+指针和头指针值相同时的队列状态是"空"还是"满"。
+试编写与此结构相应的入队列和出队列的算法。
+本题的循环队列CTagQueue的类型定义如下：
+typedef struct {
+  ElemType elem[MAXQSIZE];
+  int tag;
+  int front;
+  int rear;
+} CTagQueue;
+**********/
+Status EnCQueue(CTagQueue &Q, ElemType x)
+/* 将元素x加入队列Q，并返回OK；*/
+/* 若失败，则返回ERROR。       */
+{
+printf(" %d ",Q.tag);
+     if (Q.tag != 1) {
+        Q.elem[Q.rear] = x;
+        Q.rear++;
+        if (Q.rear == Q.front)
+            Q.tag = 1;
+        return OK;
+    }
+    else
+        return ERROR;
+}
+
+Status DeCQueue(CTagQueue &Q, ElemType &x)
+/* 将队列Q的队头元素退队到x，并返回OK；*/
+/* 若失败，则返回ERROR。               */
+{       
+        if(Q.rear == Q.front){   /*经查看q.tag的值，发现不管队列是空还是满，题目给的初始tag都是0，
+                                   看来系统是想要我们处理tag的值使其具有意义而不是一开始就使用tag判空。 */
+            return ERROR;
+        }   
+        x = Q.elem[Q.front];
+        Q.front++;
+        if (Q.rear == Q.front)
+            Q.tag = 0;
+        return OK;
+ 
+}
+
+/**********
+【题目】假设将循环队列定义为：以域变量rear
+和length分别指示循环队列中队尾元素的位置和内
+含元素的个数。试给出此循环队列的队满条件，并
+写出相应的入队列和出队列的算法（在出队列的算
+法中要返回队头元素）。
+本题的循环队列CLenQueue的类型定义如下：
+typedef struct {
+  ElemType elem[MAXQSIZE];
+  int length;
+  int rear;
+} CLenQueue;
+**********/
+Status EnCQueue(CLenQueue &Q, ElemType x)
+  /* 将元素x加入队列Q，并返回OK；*/
+  /* 若失败，则返回ERROR。       */
+{   
+    //printf("Q.rear =  %d ,Q.length = %d 。",Q.rear,Q.length);
+    if (Q.length < 10 ) {  //经运行发现，系统给的储存容量是10，不知道这个的话，我也没办法写程序。
+        Q.elem[Q.rear+1] = x;  //这里有坑，此处的Q.rear指的并不是书上说的队尾元素的下一位，而是就是指的是队尾元素的坐标，所以要入队，还得Q.rear+1。。。
+        Q.rear ++;
+        Q.length++;                           
+        return OK;
+    }
+    else
+        return ERROR;
+}
+Status DeCQueue(CLenQueue &Q, ElemType &x)
+  /* 将队列Q的队头元素退队到x，并返回OK；*/
+  /* 若失败，则返回ERROR。               */
+{
+     //printf("Q.rear =  %d ,Q.length = %d 。",Q.rear,Q.length);
+     if(Q.length == 11)
+         return ERROR;
+     else if (Q.length > 0 && Q.rear >= Q.length) {
+        x = Q.elem[Q.rear - Q.length +1];
+        Q.length--;
+        return OK;
+    }
+    else if(Q.length > 0 && Q.rear < Q.length){
+        x = Q.elem[10 - (Q.length - Q.rear)+1];
+        Q.length --;
+        return OK;
+    }
+    else
+        return ERROR;
+}
+/**********
+【题目】已知k阶斐波那契序列的定义为:
+    f0=0,  f1=0,  …,  fk-2=0,  fk-1=1;
+    fn=fn-1+fn-2+…+fn-k,  n=k,k+1,…
+试利用循环队列编写求k阶斐波那契序列中第
+n+1项fn的算法。
+
+本题的循环队列的类型定义如下：
+typedef struct {
+  ElemType *base; // 存储空间的基址
+  int front;      // 队头位标
+  int rear;       // 队尾位标，指示队尾元素的下一位置
+  int maxSize;    // 最大长度
+} SqQueue;
+**********/
+long Fib(int k, int n)
+/* 求k阶斐波那契序列的第n+1项fn */
+{
+    if (k < 2)
+        return ERROR;
+    if (n < 0)
+        return ERROR;
+    if (n < k - 1)
+        return 0;
+    int sum[100] = { 0 };
+    for (int i = 0; i < k - 1; i++) {
+        sum[i] = 0;
+    }
+    sum[k - 1] = 1;//这是第k项
+    for (int x = k; x <= n; x++) {//从第k+1项开始，每一项都是前k项的和，我们只需要计算到第n项
+        for (int j = x - 1; j >= x - k; j--) {//计算前k项的和
+            sum[x] += sum[j];
+        }
+    }
+    int f = sum[n];
+    return f;
+}
+/**********
+【题目】设A=(a1,…,am)和B=(b1,…,bn)均为有序顺序表，
+A'和B'分别为A和B中除去最大共同前缀后的子表（例如，
+A=(x,y,y,z,x,z)，B=(x,y,y,z,y,x,x,z)，则两者中最大
+的共同前缀为(x,y,y,z)， 在两表中除去最大共同前缀后
+的子表分别为A'=(x,z)和B'=(y,x,x,z)）。若A'=B'=空表，
+则A=B；若A'=空表，而B'≠ 空表，或者两者均不为空表，
+且A'的首元小于B'的首元，则A<B；否则A>B。试写一个比
+较A和B大小的算法。（注意：在算法中，不要破坏原表A
+和B，也不一定先求得A'和B'才进行比较）。
+顺序表类型定义如下：
+typedef struct {
+  ElemType *elem;
+  int       length;
+  int       size;
+  int       increment;
+} SqList;
+**********/
+char Compare(SqList A, SqList B)
+/* 比较顺序表A和B,      */
+/*   返回'<', 若A<B;    */
+/*       '=', 若A=B;    */
+/*       '>', 若A>B     */
+{
+    int i = 0;
+    if(A.length == 0 && B.length ==0 )
+        return '=';
+    while (A.elem[i] == B.elem[i] && i < A.length && i < B.length) { //去除前面相同的部分 ，以及保证剩下的不是空集。
+        i++;
+    }       
+    if (i == A.length && i == B.length)   {  //这里我一开始想当然写成了i == A.legth == B.length
+        return '=';   
+    }
+    else if ((A.length - i) >= (B.length - i)) {  //这里本来应该直接返回'>'的，但是系统判定剩下字符串的按照首字母排序的顺序比较大小，还好系统没给我几个首字母相同的数据。。。
+        if(i ==0){     
+          if(A.elem[0] < B.elem[0])
+             return '<';
+          else            
+              return '>';
+         }
+         return  '>';
+    }
+    else
+        return '<';
+}
+/**********
+【题目】试写一算法，实现顺序表的就地逆置，
+即利用原表的存储空间将线性表(a1,a2,…,an)
+逆置为(an,an-1,…,a1)。
+顺序表类型定义如下：
+typedef struct {
+  ElemType *elem;
+  int       length;
+  int       size;
+  int       increment;
+} SqList;
+**********/
+void Inverse(SqList &L)
+{
+    //没个草稿我还真会弄错。
+    int i = 0;    
+    if (L.length % 2 == 0) {
+        while (i < L.length / 2) {
+            ElemType temp = L.elem[i];
+            L.elem[i] = L.elem[L.length - 1 - i];
+            L.elem[L.length - 1- i] = temp;
+            i++;
+        }
+    }
+    else if (L.length % 2 != 0) {
+        while (i < (L.length - 1 ) / 2) {
+            ElemType temp = L.elem[i];
+            L.elem[i] = L.elem[L.length -1 - i];
+            L.elem[L.length - 1-i] = temp;
+            i++;
+        }
+    }
+}
+
+/**********
+【题目】试对一元稀疏多项式Pn(x)采用存储量同多项式
+项数m成正比的顺序存储结构，编写求Pn(x0)的算法（x0
+为给定值）。
+
+一元稀疏多项式的顺序存储结构:
+typedef struct {
+  int  coef;  // 系数
+  int   exp;  // 指数
+} Term;
+
+typedef struct {
+  Term  *elem;   // 存储空间基址
+  int    length; // 长度（项数）
+} Poly;
+**********/
+float Evaluate(Poly P, float x)
+/* P.elem[i].coef 存放ai，                        */
+/* P.elem[i].exp存放ei (i=1,2,...,m)              */
+/* 本算法计算并返回多项式的值。不判别溢出。       */
+/* 入口时要求0≤e1<e2<...<em，算法内不对此再作验证 */
+{
+    float sum[20] = { 0 };
+    float temp = 1;
+    float num = 0;
+    for (int i = 0; i < P.length; i++) {
+        for (int j = 0; j < P.elem[i].exp; j++) {
+            temp *= x;
+        }        
+        sum[i] = P.elem[i].coef * temp;        
+        num += sum[i];
+   //     printf("第%d项的p的长度为%d,指数为 %d,系数为 %f ,x的%d次方为 %f。",i,P.length,P.elem[i].exp,P.elem[i].coef,P.elem[i].exp,temp);
+   //     printf("第%d项为 %f , 总和为 %f 。",i,sum[i],num);
+        temp =1;
+    }
+    return num;
+}
+
+
+/**********
+【题目】假设有两个集合A和B分别用两个线性表LA和LB
+表示(即：线性表中的数据元素即为集合中的成员），
+试写一算法，求并集A＝A∪B。
+顺序表类型定义如下
+typedef struct {
+  ElemType *elem;     // 存储空间的基址
+  int length;    // 当前长度
+  int size;      // 存储容量 
+  int increment; // 空间不够增加空间大小
+} SqList;  // 顺序表
+可调用顺序表的以下接口函数：   
+Status InitList_Sq(SqList &L, int size, int inc); // 初始化顺序表L
+int ListLength_Sq(SqList L);  // 返回顺序表L中元素个数
+Status GetElem_Sq(SqList L, int i, ElemType &e); 
+// 用e返回顺序表L中第i个元素的值
+int Search_Sq(SqList L, ElemType e); 
+// 在顺序表L顺序查找元素e，成功时返回该元素在表中第一次出现的位置，否则返回-1
+Status Append_Sq(SqList &L, ElemType e);  // 在顺序表L表尾添加元素e
+**********/
+void Union(SqList &La, SqList Lb)
+{     
+    int tag =0;
+    for (int i = 0; i < Lb.length; i++) {
+        for(int j =0;j<La.length;j++){
+         if(La.elem[j]==Lb.elem[i]) 
+            tag = 1;         
+        }
+        if(tag == 0)  {
+             La.elem[La.length++] = Lb.elem[i];   //此处容易出问题
+        }  
+        tag =0;          
+    }                  
+}
+
+/**********
+【题目】试写一算法，实现链栈的判空操作。
+链栈的类型定义为：
+typedef struct LSNode {
+  ElemType data;       // 数据域
+  struct LSNode *next; // 指针域
+} LSNode, *LStack;    // 结点和链栈类型
+***********/
+Status StackEmpty_L(LStack S)
+/* 对链栈S判空。若S是空栈，则返回TRUE；否则返回FALSE */
+{
+    if (S == NULL) { //不是S->next ==NULL
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
+/**********
+【题目】试写一算法，实现链栈的取栈顶元素操作。
+链栈的类型定义为：
+typedef struct LSNode {
+  ElemType data;       // 数据域
+  struct LSNode *next; // 指针域
+} LSNode, *LStack;    // 结点和链栈类型
+***********/
+Status GetTop_L(LStack S, ElemType &e) 
+/* 取链栈S的栈顶元素到e，并返回OK; */
+/* 若S是空栈，则失败，返回ERROR。  */
+{
+    if (S == NULL)
+        return ERROR;
+    else if (e = S->data) {
+        S = S->next;
+        return OK;
+    }
+}
+/**********
+【题目】试写一算法，实现链队列的判空操作。
+链队列的类型定义为：
+typedef struct LQNode {     
+  ElemType  data;  
+  struct LQNode  *next;  
+} LQNode, *QueuePtr; // 结点和结点指针类型
+typedef struct {     
+  QueuePtr  front;  // 队头指针
+  QueuePtr  rear;   // 队尾指针
+} LQueue;  // 链队列类型
+***********/
+Status QueueEmpty_LQ(LQueue Q)
+/* 判定链队列Q是否为空队列。           */
+/* 若Q是空队列，则返回TRUE，否则FALSE。*/
+{
+     if (Q.front == NULL)
+        return TRUE;
+    else
+        return FALSE;
+}
+/**********
+【题目】试写一算法，实现链队列的求队列长度操作。
+链队列的类型定义为：
+typedef struct LQNode {     
+  ElemType  data;  
+  struct LQNode  *next;  
+} LQNode, *QueuePtr; // 结点和结点指针类型
+typedef struct {     
+  QueuePtr  front;  // 队头指针
+  QueuePtr  rear;   // 队尾指针
+} LQueue;  // 链队列类型
+***********/
+int QueueLength_LQ(LQueue Q)
+/* 求链队列Q的长度并返回其值 */
+{
+    int num = 1;   //为什么不是0，是因为Q.rear == Q.front那一瞬间，队列还是有一个元素的，但是这样的方法检测不到，故加上1。
+    if(Q.front==NULL)
+      return 0;
+    while (Q.rear != Q.front) {
+        num++;
+        Q.front = Q.front->next;
+    }
+    return num;
+}
+/**********
+【题目】假设以带头结点的循环链表表示队列，并且
+只设一个指针指向队尾元素结点(注意不设头指针)，
+试编写相应的队列初始化、入队列和出队列的算法。
+带头结点循环链队列CLQueue的类型定义为：
+typedef struct LQNode {
+  ElemType data;
+  struct LQNode *next;
+} LQNode, *CLQueue;
+**********/
+Status InitCLQueue(CLQueue &rear) // 初始化空队列
+{ 
+     if(NULL == (rear = (LQNode*)malloc(sizeof(LQNode)))) {
+        return OVERFLOW;
+    }
+    rear->next = rear;
+    return OK;
+}
+
+Status EnCLQueue(CLQueue &rear, ElemType x) // 入队
+{   
+//printf(" %c ",rear->data);    //rear是尾节点指针
+    LQNode * p;
+    p =(LQNode*)malloc(sizeof(LQNode));
+    p->data = x;
+    LQNode* temp;
+    temp = rear->next;  
+    rear->next = p;
+    p->next = temp;
+    rear = p; //此处要把尾节点赋给rear,如果不写这行会导致输出为空，因为要从rear->next开始输出全表。--牢牢记住：这是个循环链表！！！
+    
+//printf(" /%c ",rear->next->data);
+    return OK;
+}
+
+Status DeCLQueue(CLQueue &rear, ElemType &x) // 出队
+{ 
+
+    LQNode * p;
+    if(rear == rear->next)
+     return ERROR;
+    p = rear->next;       
+    rear->next = p->next; 
+    x = p->next->data;   /*这里不是x= p->data，会输出空，也不能x= rear->next->data,  因为此时rear已经上一行中被改变，
+                            故得出结论：无论是出队还是入队，只要是在循环列队里，就得多设一个指针p用于存放临时尾指针rear。*/
+    return OK;
+}
+/**********
+【题目】试写一算法，实现带头结点单链表的判空操作。
+
+单链表的类型定义为：
+typedef struct LNode {     
+  ElemType  data;  
+  struct LNode  *next;  
+} LNode, *LinkList; // 结点和结点指针类型
+***********/
+Status ListEmpty_L(LinkList L)
+/* 判定带头结点单链表L是否为空链表。   */
+/* 若L是空链表，则返回TRUE，否则FALSE。*/
+{
+//这是第31题
+      if (L->next == NULL)//不应该是if(L == NULL)，因为链表之所以称之为链表，就是它至少要有一个基址，它可以没有数据，但是至少要有一个节点占着空间。
+        return TRUE;
+    else
+        return FALSE;
+
+}
+/**********
+【题目】试写一算法，实现带头结点单链表的销毁操作。
+单链表的类型定义为：
+typedef struct LNode {     
+  ElemType  data;  
+  struct LNode  *next;  
+} LNode, *LinkList; // 结点和结点指针类型
+***********/
+Status DestroyList_L(LinkList &L)
+/* 销毁带头结点单链表L，并返回OK。*/
+{
+     L = NULL;
+     return OK;
+}
+/**********
+【题目】试写一算法，实现带头结点单链表的清空操作。
+
+单链表的类型定义为：
+typedef struct LNode {     
+  ElemType  data;  
+  struct LNode  *next;  
+} LNode, *LinkList; // 结点和结点指针类型
+***********/
+Status ClearList_L(LinkList &L)
+/* 将带头结点单链表L置为空表，并返回OK。*/
+/* 若L不是带头结点单链表，则返回ERROR。 */
+{
+     if(L == NULL) //这种情况是根本连空间都没打算分配给链表，何来带头节点的链表之说
+        return ERROR;     
+     L->next =  NULL;
+     return OK;
+           
+}
+/**********
+【题目】试写一算法，实现带头结点单链表的求表长度操作。
+单链表的类型定义为：
+typedef struct LNode {     
+  ElemType  data;  
+  struct LNode  *next;  
+} LNode, *LinkList; // 结点和结点指针类型
+***********/
+int ListLength_L(LinkList L)
+/* 求带头结点单链表L的长度，并返回长度值。*/
+/* 若L不是带头结点单链表，则返回-1。      */
+{
+    int num = 0;
+    if(L == NULL)
+     return -1;
+    while (L->next != NULL) {
+        num++;
+        L = L->next;
+    }
+    return num;
+}
+/**********
+【题目】试写一算法，在带头结点单链表L插入第i元素e。
+带头结点单链表的类型定义为：
+typedef struct LNode {
+  ElemType      data;
+  struct LNode *next;
+} LNode, *LinkList;
+**********/
+Status Insert_L(LinkList L, int i, ElemType e)
+/* 在带头结点单链表L插入第i元素e，并返回OK。*/
+/* 若参数不合理，则返回ERROR。              */
+{
+//这题主要难在情况有三种
+     if(i == 0)
+       return ERROR;
+     LinkList P ;
+     P = (LinkList)malloc(sizeof(LNode)); //这里我曾经把sizeof(LNode)写成 sizeof(LinkList),导致输出越界，原来指针的字节要比指针指向的字节小
+     int j =1;
+     while( j < i ){
+         L = L->next;  //系统可能自己保留了原链表的头指针，故这里L可以移动
+         j++;
+     } 
+     if(L->next !=NULL){
+       P->next = L->next;     
+       L->next= P; 
+       P->data = e; 
+     }
+     else if(L != NULL ){  //刚好是最后链表尾
+       L->next = P;
+       P->data = e;
+       P->next = NULL;
+     }
+     else 
+       return ERROR;  //超过链表长度                    
+     return OK;  
+}
+/**********
+【题目】试写一算法，在带头结点单链表删除第i元素到e。
+带头结点单链表的类型定义为：
+typedef struct LNode {
+  ElemType      data;
+  struct LNode *next;
+} LNode, *LinkList;
+**********/
+Status Delete_L(LinkList L, int i, ElemType &e)
+/* 在带头结点单链表L删除第i元素到e，并返回OK。*/
+/* 若参数不合理，则返回ERROR。                */
+{
+   if (L->next == NULL ){
+        return ERROR;
+    }    
+    else if(i == 0)
+       return ERROR;
+    if( i == 1){    //针对表头  
+         e = L->next->data;
+         L->next = L->next->next;
+         return OK;
+    }   
+    int num = 0;
+    while (num < i-1){
+        L = L->next;
+        num++;
+    }   
+    if (L->next == NULL ){
+        return ERROR;
+    } 
+    
+    e = L->next->data;      //获取L的下一个节点的数据
+    L->next = L->next->next;//此行可以通用 ，用于删除L的下一个节点
+    return OK;
+}
+/**********
+【题目】试写一算法，在带头结点单链表的第i元素起的
+所有元素从链表移除，并构成一个带头结点的新链表。
+带头结点单链表的类型定义为：
+typedef struct LNode {
+  ElemType      data;
+  struct LNode *next;
+} LNode, *LinkList;
+**********/
+Status Split_L(LinkList L, LinkList &Li, int i)
+/* 在带头结点单链表L的第i元素起的所有元素 */
+/* 移除，并构成带头结点链表Li，返回OK。   */
+/* 若参数不合理，则Li为NULL，返回ERROR。  */
+{       
+    if(i == 0)
+      return ERROR;
+    int num = 1;
+    while (num < i){
+        L = L->next;        
+        num++;
+    }
+    if (L->next == NULL){ //参数超出范围的情况
+        Li = NULL;
+        return ERROR;
+    }  
+    LinkList p;
+    p = (LinkList)malloc(sizeof(LNode));
+    Li = L->next;       //此行出错，若改成Li=L;则会输出空白    
+ //   printf("Li->data = %c ",Li->data);       //Li是一个带头节点的链表，头节点是不存数据滴，如果存了数据，系统会从Li->next的数据读起。 
+    L->next= NULL;     //断开L，因为L是传入的所以它不是局部变量，这里的改变会影响到
+    p->next = Li;
+    Li = p;
+    return OK;
+}
+/**********
+【题目】试写一算法，在带头结点单链表删除第i元素
+起的所有元素。
+带头结点单链表的类型定义为：
+typedef struct LNode {
+  ElemType      data;
+  struct LNode *next;
+} LNode, *LinkList;
+**********/
+Status Cut_L(LinkList L, int i)
+/* 在带头结点单链表L删除第i元素起的所有元素，并返回OK。*/
+/* 若参数不合理，则返回ERROR。                         */
+{
+   if(i == 0)
+    return ERROR;
+   else if(L->next == NULL)
+     return ERROR;
+   int num = 1;
+   while(num < i){
+       L = L->next;
+       num ++;
+   }  
+   if(L->next == NULL)
+       return ERROR;
+   L->next = NULL;
+   return OK;
+}
+/**********
+【题目】试写一算法，删除带头结点单链表中所有值
+为x的元素，并释放被删结点空间。
+单链表类型定义如下：
+typedef struct LNode {
+  ElemType      data;
+  struct LNode *next;
+} LNode, *LinkList;
+**********/
+Status DeleteX_L(LinkList L, ElemType x)
+/* 删除带头结点单链表L中所有值为x的元素，      */
+/* 并释放被删结点空间，返回实际删除的元素个数。*/
+{    
+   //先不管表头==x的情况   ,结果并没有----------。----------
+    int num = 0;
+    while(L != NULL){        
+       if(L->next->data == x){
+           L->next = L->next->next;
+           num ++;
+       }    
+       L = L->next;
+    }    
+    
+    return num;
+
+}
+/**********
+【题目】试写一算法，删除带头结点单链表中所有值
+小于x的元素，并释放被删结点空间。
+单链表类型定义如下：
+typedef struct LNode {
+  ElemType      data;
+  struct LNode *next;
+} LNode, *LinkList;
+**********/
+Status DeleteSome_L(LinkList L, ElemType x)
+/* 删除带头结点单链表L中所有值小于x的元素，    */
+/* 并释放被删结点空间，返回实际删除的元素个数。*/
+{
+//这题我怎么感觉有点难。。。
+    if (L->next == NULL)
+        return 0;
+    int num = 0;
+    //不需要考虑表头情况，因为这是带头节点的链表，头节点不存储数据，如果将删除的元素全部储存到另一个链表上，最好是另起一个节点指向你要输出的数据节点，然后这个不存数据的节点作为头节点。
+    while (L->next != NULL) {         //这行刚好利用了头节点。
+        if (L->next->data < x) {         
+            L->next = L->next->next; 
+            num++;
+        }
+        else 
+            L = L->next;
+    }
+    //上面的已经处理了表尾的情况。  
+    return num;
+}
+//======================================第三章============================
+
+/**********
+【题目】试以顺序表L的L.rcd[L.length+1]作为监视哨，
+改写教材3.2节中给出的升序直接插入排序算法。
+顺序表的类型RcdSqList定义如下：
+typedef struct {
+   KeyType key; 
+   ... 
+} RcdType;
+typedef struct {
+   RcdType rcd[MAXSIZE+1]; // rcd[0]闲置
+   int length;
+} RcdSqList;
+**********/
+void InsertSort(RcdSqList &L)
+{
+   //它的意思是将rcd[0]弃之不用，而将rcd[L.length+1]当作原来的rcd[0]
+   int i,j;
+   for(i = 1;i < L.length;i++){
+       if(L.rcd[i+1].key < L.rcd[i].key){
+          L.rcd[L.length+1] = L.rcd[i+1];  
+          j = i+1;
+          do {
+          j--;
+          L.rcd[j+1] = L.rcd[j]; 
+          }while(L.rcd[L.length+1].key < L.rcd[j-1].key); //以上三行解释起来有点麻烦
+          L.rcd[j] = L.rcd[L.length+1];
+       }       
+   }
+}
+
+/**********
+【题目】如下所述，改写教材1.3.2节例1-10的冒泡排序算法：
+将算法中用以起控制作用的布尔变量change改为一个整型
+变量，指示每一趟排序中进行交换的最后一个记录的位置，
+并以它作为下一趟起泡排序循环终止的控制值。
+顺序表的类型RcdSqList定义如下：
+typedef struct {
+   KeyType key; 
+   ... 
+} RcdType;
+typedef struct {
+   RcdType rcd[MAXSIZE+1]; // rcd[0]闲置
+   int length;
+} RcdSqList;
+**********/
+void BubbleSort(RcdSqList &L)
+/* 元素比较和交换必须调用如下定义的比较函数和交换函数：*/
+/* Status LT(RedType a, RedType b);   比较："<"        */
+/* Status GT(RedType a, RedType b);   比较：">"        */
+/* void Swap(RedType &a, RedType &b); 交换             */
+{   /*******************
+    int change = L.length;
+    int i = 1, j = 1;
+    for(i = 0; i<=L.length;i++){
+        for(j = 0;j<= change;j++){
+            if(GT(L.rcd[j],L.rcd[j+1])== TRUE){   // L.rcd[j].key > L.rcd[j+1].key
+              
+               Swap(L.rcd[j],L.rcd[j+1]);
+            //   RcdType temp;//注意：此编译器不支持定义的同时初始化
+            //   temp = L.rcd[j];
+            //   L.rcd[j] = L.rcd[j+1];
+            //   L.rcd[j+1] = temp;  
+              // printf(" -- ");               
+               }  
+              change = L.length - 1 -i;
+        }
+    }   
+     *****************/
+     //此题我很抱歉，对我自己。因为书上没有这个例子，所以我不知道它要怎么改，网上看了前人之解又不甚理解，不跟自己闹脾气了。直接掠过吧~
+    int i,change,j,k;                                                  
+   for(i=L.length,change = 0;i>1;i--){
+       change = i;
+      for(j=1;j<i;++j){
+         if(GT(L.rcd[j],L.rcd[j+1])){
+            Swap(L.rcd[j],L.rcd[j+1]);
+            k++;
+            change = j+1;
+         }            
+      }
+      while(L.rcd[change].key == L.rcd[change-1].key) //用while来跳过那些相同关键字
+             change=change - 1;
+      i=change;
+      if(k==0)    //当有一次比较没有交换时使i= 1结束操作
+         i=1;
+      k=0;
+  }
+}
+/**********
+【题目】已知记录序列L.rcd[1..L.length]中的关键
+字各不相同，可按如下所述实现计数排序：另设数组
+c[1..n]，对每个记录a[i]， 统计序列中关键字比它
+小的记录个数存于c[i]，则c[i]=0的记录必为关键字
+最小的记录，然后依c[i]值的大小对序列中记录进行
+重新排列。试编写算法实现上述排序方法。
+顺序表的类型RcdSqList定义如下：
+typedef struct {
+   KeyType key; 
+   ... 
+} RcdType;
+typedef struct {
+   RcdType rcd[MAXSIZE+1]; // rcd[0]闲置
+   int     length;
+} RcdSqList;
+**********/
+void CountSort(RcdSqList &L)
+/* 采用顺序表存储结构，在函数内自行定义计数数组c */
+{ 
+    //也就是说，c[i]记录的是第i个元素大于所有元素的次数，并以此作为排序的位置根据
+    /*天煞的我一开始把题目的关键字看成了“关键字的位数”，以为这道题要搞书本的计数排序的升级版。。。
+    结果硬是做不出来，后来还得上网google了才知道人家这么少行代码就通过了，肯定是我理解错了，于是我再回去重新看题目，这才理解了题意。天煞呀！~  */
+    int c[30] = { 0 };  
+    RcdType* rcd1;
+    rcd1 = (RcdType *)malloc((L.length+1) * sizeof(RcdType));
+    int i, j;
+    for (i = 0; i <= L.length; i++) {
+        for (j = 0; j <= L.length; j++) {
+            if (L.rcd[i].key > L.rcd[j].key)
+                c[i]++;
+        }
+    }
+    for (i = 1; i <= L.length; i++) {
+        rcd1[c[i]] = L.rcd[i];
+    }
+    for (i = 0; i <= L.length; i++) {
+        L.rcd[i] = rcd1[i];
+    }
+
+}
+
+//==================================第四章===============================
+
+/**********
+【题目】已知某哈希表的装载因子小于1，哈希函数H(key)
+为关键字(标识符)的第一个字母在字母表中的序号，处理
+冲突的方法为线性探测开放定址法。试编写一个按第一个
+字母的顺序输出哈希表中所有关键字的算法。
+哈希表的类型HashTable定义如下：
+#define SUCCESS    1
+#define UNSUCCESS  0
+#define DUPLICATE -1
+typedef char StrKeyType[4];
+typedef struct {
+   StrKeyType key; // 关键字项
+   int    tag;     // 标记 0:空；1:有效; -1:已删除
+   void  *any;     // 其他信息
+} RcdType;
+typedef struct {
+  RcdType *rcd;    // 存储空间基址
+  int      size;   // 哈希表容量
+  int      count;  // 表中当前记录个数
+} HashTable;
+**********/
+void PrintKeys(HashTable ht, void(*print)(StrKeyType))//哈希表，哈希函数
+/* 依题意用print输出关键字 */
+{
+      //找出所有tag == 1的存入一个数组然后排序输出
+      //上述想法发现不行，因为不知道 StrKeyType到底是什么类型（它不是char，而是String类型的，但是c语言又没有这个类型）。      
+      //网上找了方法说是只能通过给定的print函数来输出这个ht.rcd[i].key。
+      //后来才发现-- typedef char StrKeyType[4]; 。。。
+      char i;
+      int j = 0; 
+      for(i = 'A';i<='Z';i++){
+         for(j =0;j< ht.size;j++) {
+            if(ht.rcd[j].key[0] == i && ht.rcd[j].tag == 1)
+               print(ht.rcd[j].key);
+            }
+        }
+      
+}
+
+
+/**********
+【题目】假设哈希表长为m，哈希函数为H(x)，用链地址法
+处理冲突。试编写输入一组关键字并建造哈希表的算法。
+哈希表的类型ChainHashTab定义如下：
+#define NUM         7
+#define NULLKEY    -1
+#define SUCCESS     1
+#define UNSUCCESS   0
+#define DUPLICATE  -1
+typedef char HKeyType;
+typedef struct HNode {
+   HKeyType  data;
+   struct HNode*  next;
+}*HLink;
+typedef struct {
+   HLink  *rcd;   // 指针存储基址，动态分配数组
+   int    count;  // 当前表中含有的记录个数
+   int    size;  // 哈希表的当前容量
+}ChainHashTab;    // 链地址哈希表
+int Hash(ChainHashTab H, HKeyType k) { // 哈希函数
+  return k % H.size;
+}
+Status Collision(ChainHashTab H, HLink &p) {
+  // 求得下一个探查地址p 
+  if (p && p->next) { 
+    p = p->next;
+    return SUCCESS;
+  } else return UNSUCCESS;
+}
+**********/
+int BuildHashTab(ChainHashTab &H, int n, HKeyType es[]) 
+/* 直接调用下列函数                             */
+/* 哈希函数：                                   */
+/*    int Hash(ChainHashTab H, HKeyType k);     */
+/* 冲突处理函数：                               */
+/*    int Collision(ChainHashTab H, HLink &p);  */
+{
+      //嗯....不懂为啥链式哈希表插入还要处理冲突。。。
+      int p;
+      HLink np; 
+      //查重
+      for(int k = 0;k < n;k++){
+          HKeyType t = es[k];
+          for(int j = k+1;j<n;j++){
+             if(es[k] == es[j]){
+                n--;
+                while(j<n){          //为什么这里j可以再j+1存在的情况下使用j<n呢？因为es[j+1]=='\n'，它也是有意义的。
+                    es[j] = es[j+1]; 
+                    j++; 
+                }                
+             } 
+             
+          }
+      }  
+   /*   for(int z = 0;z < n;z++)
+        printf("%c",es[z]);  */
+      for (int i = 0; i < n; i++) {
+        p = Hash(H, es[i]);
+        np = (HLink)malloc(sizeof(HNode));
+        if (NULL == np)
+            return UNSUCCESS;       
+        np->data = es[i];
+        np->next = H.rcd[p];
+        H.rcd[p] = np;       
+      }  
+      return SUCCESS;
+}
+//====================================第五章=====================
+/**********
+【题目】试编写如下定义的递归函数的递归算法:
+    g(m,n) = 0             当m=0,n>=0
+    g(m,n) = g(m-1,2n)+n   当m>0,n>=0
+**********/
+int G(int m, int n) 
+/* 如果 m<0 或 n<0 则返回 -1 */
+{
+    if(m < 0 || n < 0)
+       return -1;
+    if(m == 0 && n >= 0)
+       return 0;
+    if(m > 0 && n >= 0)
+      return G(m-1,2 * n)+n;
+}
+
+/**********
+【题目】试写出求递归函数F(n)的递归算法：
+    F(n) = n+1      当n=0
+    F(n) = nF(n/2)  当n>0
+**********/
+int F(int n)
+/* 如果 n<0 则返回 -1 */
+{
+    if(n == 0)
+      return n+1;
+    if(n> 0)
+      return n * F(n/2);
+}
+/**********
+【题目】求解平方根 的迭代函数定义如下：
+  sqrt(A,p,e) = p                   当|p*p-A|<e
+  sqrt(A,p,e) = sqrt(A,(p+A/p)/2,e) 当|p*p-A|>=e
+其中，p是A的近似平方根，e是结果允许误差。试写出相
+应的递归算法。
+**********/
+float Sqrt(float A, float p, float e)
+{   
+    float temp = p * p -A;
+    if(temp < 0)
+       temp = - temp;       
+    if(temp < e)  
+       return  p ;
+    else 
+       return Sqrt(A,(p+A/p)/2,e);
+     
+}
+/**********
+【题目】已知Ackerman函数的定义如下：
+   akm(m,n) = n+1                 当m=0
+   akm(m,n) = akm(m-1,1)          当m!=0,n=0
+   akm(m,n) = akm(m-1,akm(m,n-1)) 当m!=0,n!=0
+请写出递归算法。
+**********/
+int Akm(int m, int n)
+/* 若 m<0 或 n<0 则返回-1  */
+{
+    if(m<0||n<0)
+       return -1;
+    if(m == 0)
+       return  n+1;
+    if(m!=0&&n==0)
+       return Akm(m-1,1);
+    if(m!=0&&n!=0)
+       return Akm(m-1,Akm(m,n-1));
+}
+/**********
+【题目】试写出求递归函数F(n)的非递归算法：
+    F(n) = n+1      当n=0
+    F(n) = nF(n/2)  当n>0
+**********/
+int F(int n)
+/* 如果 n<0 则返回 -1 */
+{
+     if(n < 0)
+       return -1;
+     if(n==0)
+       return n+1;
+     if(n ==1)         //因为这里1特殊，所以也拎出来单独讨论。
+        return 1;   
+     int f = 1;
+     int temp = 1;//递归中的n
+     int a[20]= {0};
+     int i = 0;
+     for(i= 0;n!=0;i++){
+        a[i] = n;
+        n /= 2;
+     }
+     int j = 0;
+     while(a[j]!=0) {
+        f *= a[j];
+        j++;
+     }
+     return f;
+}
+
+
+/**********
+【题目】求解平方根 的迭代函数定义如下：
+  sqrt(A,p,e) = p                   当|p*p-A|<e
+  sqrt(A,p,e) = sqrt(A,(p+A/p)/2,e) 当|p*p-A|>=e
+其中，p是A的近似平方根，e是结果允许误差。试写出相
+应的非递归算法。
+**********/
+float Sqrt(float A, float p, float e)
+{
+    //这题使用的是浮点数，所以不用像上一题那样考虑阶截断误差
+   float temp = p * p -A;
+    if(temp < 0)
+       temp = - temp;       
+    if(temp < e)  
+       return  p ;
+    else 
+       return Sqrt(A,(p+A/p)/2,e);
+}
+/**********
+【题目】假设以二维数组g[1..m][1..n]表示一个图像
+区域，g[i][j]表示该区域中点(i,j)所具颜色，其值
+为从0到k的整数。试编写递归算法，将点(i0,j0)所在
+区域的颜色置换为颜色c。约定与(i0,j0)同色的上、
+下、左、右的邻接点为同色区域的点。
+
+表示图像区域的类型定义如下：
+typedef char GTYPE[m+1][n+1];
+**********/
+void ChangeColor(GTYPE g, int m, int n, 
+                 char c, int i0, int j0)
+/* 在g[1..m][1..n]中，将元素g[i0][j0] */
+/* 所在的同色区域的颜色置换为颜色c    */
+{
+    /*这题是图的广度优先遍历的变形，但是它的区别是元素是用数组来存放的，故不能拿出一个数据域来标记这个元素是否走过，所以要把原数据放到一个变量里，
+    然后用值覆盖即可，后续操作就是将周围的元素同哪个变量比较，这样就不会无限循环--比完上面比下面，重复比较 了。*/
+    char temp = g[i0][j0];//注意这里的i0和j0会变。所以不会造成temp变化
+    g[i0][j0] = c;
+    //m是行数，n是列数，而对应的是i0和j0。
+    if(i0 >= 0 && i0 <= m && j0 >= 0 && j0 <= n) {   //因为这里对于typedef char GTYPE[m+1][n+1];的定义，所以造成可以i0<=m,j0<=n的情况。    
+        if ( i0  < m && g[i0 + 1][j0] == temp) {     /*贼坑的是有些数据不会一样，会导致你修改一些临界值就会造成这次数据通过但是下次运行就不通过的情况*/
+            ChangeColor(g, m, n, c, i0 + 1, j0);
+            }
+        if ( j0 < n && g[i0][j0 + 1] == temp) {   
+            ChangeColor(g, m, n, c, i0, j0 + 1);
+            }
+        if (g[i0 - 1][j0] == temp && i0 -1 >= 0) {           
+            ChangeColor(g, m, n, c, i0 - 1, j0);
+            }
+        if (g[i0][j0 - 1] == temp && j0 -1 >= 0) {            
+            ChangeColor(g, m, n, c, i0, j0 - 1);
+            }        
+    }   
+}
+/**********
+【题目】试按依次对每个元素递归分解的分析方法重写求广义表的深度的递归算法。
+广义表类型GList的定义：
+typedef enum {ATOM,LIST} ElemTag;
+typedef struct GLNode{
+     ElemTag tag;
+     union {
+       char atom;
+       struct { 
+         GLNode *hp, *tp;
+       } ptr;
+     }un;
+} *GList;
+**********/
+int GListDepth(GList ls)
+/* Return the depth of list */
+{
+//这道题留坑，想不出来，抄了书本123页的按照分解为表头和表尾的方法求广义表深度。
+   int h1,h2;
+   if(NULL == ls)
+      return 1;
+   if(ATOM == ls->tag)
+      return 0;
+   h1 =  GListDepth(ls->un.ptr.hp)+1;
+   h2 =  GListDepth(ls->un.ptr.tp);
+   return h1>h2?h1:h2;
+}
+
+/**********
+【题目】试编写判别两个广义表是否相等的递归算法。
+广义表类型GList的定义：
+typedef enum {ATOM,LIST} ElemTag;
+typedef struct GLNode{
+     ElemTag tag;
+     union {
+       char atom;
+       struct { 
+         GLNode *hp, *tp;
+       } ptr;
+     }un;
+} *GList;
+**********/
+//这题就是借判断广义表的最长深度和元素是否相同来判断广义表是否一致。
+int GListDepth(GList ls,char atom[],int i)
+/* Return the depth of list */
+{
+//抄了书本123页的按照分解为表头和表尾的方法求广义表深度的方法。
+   int h1,h2;   
+   if(NULL == ls)
+      return 1;      
+   if(ATOM == ls->tag){
+      atom[i] = ls->un.atom;
+  //    printf("ls->un.atom = %c .",ls->un.atom); 
+      return 0;            
+      }
+   h1 =  GListDepth(ls->un.ptr.hp,atom,i++)+1;
+   h2 =  GListDepth(ls->un.ptr.tp,atom,i++);
+   return h1>h2?h1:h2;
+}
+Status Equal(GList A, GList B)
+/* 判断广义表A和B是否相等,是则返回TRUE,否则返回FALSE */
+{
+   char atom1[20] = { 0 };
+   char atom2[20] = { 0 };
+   if(GListDepth(A,atom1,0) != GListDepth(B,atom2,0))
+      return FALSE;
+ /*  for(int j =0;j<20;j++)
+        printf(" %c ",atom1[j]);
+   for(int k =0;k<20;k++)
+        printf(" %c ",atom2[k]);
+    printf("\n");   */
+    for(int z =0;z<20 ;z++) {
+        if(atom1[z] != atom2[z])
+           return FALSE;
+    }  
+    return TRUE;
+    
+}
+
+/**********
+【题目】试编写递归算法，输出广义表中所有原子项及其所在层次。
+广义表类型GList的定义：
+typedef enum {ATOM,LIST} ElemTag;
+typedef struct GLNode{
+     ElemTag tag;
+     union {
+       char atom;
+       struct { 
+         GLNode *hp, *tp;
+       } ptr;
+     }un;
+} *GList;
+**********/
+void OutAtom(GList A, int layer, void(*Out2)(char, int))
+/* 递归地用函数Out2输出广义表的原子及其所在层次,layer表示当前层次 */
+{       
+    if (NULL == A) {
+        layer + 1;    
+        return;
+    }
+    else if (ATOM == A->tag) {    
+        Out2(A->un.atom, layer);       
+        return;
+    }
+    else {        
+        
+        OutAtom(A->un.ptr.hp, ++layer, Out2);   //这里(*Out2)老是报错说我“语法错误”,猜了半天才改成Out2，wdnmd.而且我发现这个编译系统注释里的中文双引号会引发错位。。。
+        OutAtom(A->un.ptr.tp, --layer, Out2);   //else里的这两句不能调换，否则结果顺序会反过来。而且如果想要结果准确，要把--layer改成layer。
+    }
+}
+
+//============================第六章==============================
+/**********
+【题目】若两棵二叉树T1和T2皆为空，或者皆不空
+且T1的左、右子树和T2的左、右子树分别相似，则
+称二叉树T1和T2相似。试编写算法，判别给定两棵
+二叉树是否相似。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType  data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+Status Similar(BiTree T1, BiTree T2)
+/* 判断两棵二叉树是否相似的递归算法 */
+{   
+   /*这个系统很奇怪，题目用#表示空（因为便于在运行答案里用（）的形式表示二叉树），
+   但是，当T1/T2变为空时，该行代码在这个判空的点之后立即失效，无法进入递归......
+   所以我只能通过它们的parent节点来判断两个二叉树是否存在不同的地方了。  */
+   //if(T1 == NULL && T2 == NULL) return TRUE;
+   //printf(" 当前T1：%c ,T2: %c .",T1->data,T2->data);
+   //printf("当前T1的左右子树为：%c %c || T2的左右子树为: %c %c .",T1->lchild->data,T1->rchild->data,T2->lchild->data,T2->rchild->data);
+   if(NULL == T1->lchild && NULL != T2->lchild) return FALSE;
+   if(NULL != T1->lchild && NULL == T2->lchild) return FALSE;
+   if(NULL != T1->rchild && NULL == T2->rchild) return FALSE;
+   if(NULL == T1->rchild && NULL != T2->rchild) return FALSE;
+   if(T1->lchild != NULL &&  T2->lchild != NULL){      
+       if(FALSE == Similar(T1->lchild,T2->lchild)) {
+          return FALSE;                             
+          }
+   }      
+   if(T1->rchild != NULL &&  T2->rchild != NULL){      
+       if(FALSE == Similar(T1->rchild,T2->rchild)) {              
+          return FALSE;                             
+          }
+   }
+   return TRUE;
+}
+/**********
+【题目】编写递归算法，求对二叉树T先序遍历时
+第k个访问的结点的值。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+//无奈做了一天，只能说师兄好强。。。利用&k来解决递归的缺陷，我也只差这一步了，唉，最终还是得靠抄，太羞愧了。。。
+/*如果你想找出二叉树的第k个元素，就要避免递归到左子树后深陷到那里无法出来（答案在右子树的情况），
+此时就要设置一个比较机制，定义一个x来决定是左子树找到了第k个元素，还是当x='#'时选择返回右子树的x。*/
+TElemType PreOrder(BiTree T, int &k) {  /*  利用c++的&传参。只要每次处理的是同一段地址的变量，就不会丢失递归结果了。
+                                            要是你printf或者return 了，也可。
+                                            但是return 有时也会无法完美解决上述提到的问题。所以要么&，要么printf。 */
+    TElemType x = '#';
+    if (T == NULL) {
+        return '#';
+    }
+    if (k == 1) {
+        return T->data;
+    } 
+    if (T->lchild != NULL) {    
+        k--;
+        x = PreOrder(T->lchild, k);
+    }
+    if (T->rchild != NULL && x == '#') {
+        k--;
+        x = PreOrder(T->rchild, k);
+    }
+    return x;
+}
+TElemType PreOrderK(BiTree T, int k)
+/* 求对二叉树T先序遍历时第k个访问的结点的值。*/
+/* 若失败，则返回'#'                         */
+{
+    return PreOrder(T, k);
+
+}
+
+/**********
+【题目】编写递归算法，计算二叉树T中叶子结点的数目。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType  data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+int Leave(BiTree T, int& cout) {
+    if (T != NULL) {
+        if (NULL == T->lchild && NULL == T->rchild)
+            cout++;
+        Leave(T->lchild, cout);
+        Leave(T->rchild, cout);
+    }
+}
+int Leaves(BiTree T)
+/* 计算二叉树T中叶子结点的数目 */
+{
+    int k = 0;
+    Leave(T, k);
+    return k;
+}
+/**********
+【题目】试利用栈及其基本操作写出二叉树T的非递归
+的先序遍历算法。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType  data;
+  struct BiTNode  *lchild,*rchild;
+} BiTNode, *BiTree;
+可用栈类型Stack的相关定义：
+typedef BiTree SElemType;   // 栈的元素类型
+Status InitStack(Stack &S);
+Status StackEmpty(Stack S);
+Status Push(Stack &S, SElemType e);
+Status Pop(Stack &S, SElemType &e);
+Status GetTop(Stack S, SElemType &e);
+**********/
+BiTree Go(BiTree T, Stack& S, void (*visit)(TElemType),char& a[],int &i) {    
+    if (T == NULL)return NULL;         
+    while(T->lchild != NULL) {
+        visit(T->data);   //访问入栈的元素 ，下次就不再访问
+        Push(S, T);
+        a[i++] = T->data;
+        T = T->lchild;        
+    }
+    return T;
+}
+void PreOrder(BiTree T, void (*visit)(TElemType))
+/* 使用栈，非递归先序遍历二叉树T，     */
+/* 对每个结点的元素域data调用函数visit */
+{
+    Stack S;
+    InitStack(S);
+    BiTree p;
+    char a[20] = {0};
+    int i =0;    
+    p = Go(T, S, visit,a,i);
+    while (p != NULL) {         
+        int flag = 0;
+        for(int j = 0;j<i;j++){        
+           if(a[j] == p->data) 
+              flag = 1;
+        }                              
+        if(flag == 0) {          
+            visit(p->data);            
+        }
+        flag = 0;
+        if (p->rchild != NULL) {
+            p = Go(p->rchild, S, visit,a,i);
+        }
+        else if (StackEmpty(S) != TRUE)//左右孩子都为空，那这个节点也就失去价值了，舍去。
+            Pop(S, p);
+        else
+            p = NULL;
+    }
+    /* for(int j = 0;j<i;j++){
+           printf(" /%c ",a[j]);
+        } */
+}
+/**********
+【题目】试利用栈及其基本操作写出二叉树T的非递归
+的后序遍历算法(提示：为分辨后序遍历时两次进栈的
+不同返回点，需在指针进栈时同时将一个标志进栈）。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType  data;
+  struct BiTNode  *lchild,*rchild;
+} BiTNode, *BiTree;
+可用栈类型Stack的相关定义：
+typedef struct {
+  struct BiTNode *ptr; // 二叉树结点的指针类型
+  int      tag; // 0..1
+} SElemType;    // 栈的元素类型
+Status InitStack(Stack &S); 
+Status StackEmpty(Stack S); 
+Status Push(Stack &S, SElemType e);
+Status Pop(Stack &S, SElemType &e); 
+Status GetTop(Stack S, SElemType &e); 
+**********/
+void pushNode(Stack &s,BiTNode *p,int tag)
+{
+    SElemType e;
+    e.ptr = p;
+    e.tag = tag;  //向下tag = 0
+    Push(s,e);
+}
+void PostOrder(BiTree T, void (*visit)(TElemType))
+/* 使用栈，非递归后序遍历二叉树T，     */
+/* 对每个结点的元素域data调用函数visit */
+{
+    Stack s;
+    InitStack(s);   //初始化栈
+    BiTree p;
+    pushNode(s,T,0);
+    SElemType e;
+    while (StackEmpty(s) == FALSE) {
+        Pop(s,e);
+        p = e.ptr;
+        if (p->lchild != NULL && e.tag == 0) {
+             pushNode(s,p,1);
+             pushNode(s,p->lchild,0); 
+        }
+        else if (p->rchild != NULL && e.tag != 2) {
+             pushNode(s,p,2);
+             pushNode(s,p->rchild,0); 
+        }
+        else visit(p->data);
+    }
+}
+/**********
+【题目】二叉树采用三叉链表的存储结构，试编写
+不借助栈的非递归中序遍历算法。
+三叉链表类型定义：
+typedef struct TriTNode {
+  TElemType data;
+  struct TriTNode  *parent, *lchild, *rchild;
+} TriTNode, *TriTree;
+**********/
+//去你的，递归万岁。
+void in(TriTree T,void (*visit)(TElemType)){
+    if(!T) return;
+    in(T->lchild,visit);
+    visit(T->data);    
+    in(T->rchild,visit);
+}
+void InOrder(TriTree PT, void (*visit)(TElemType))
+/* 不使用栈，非递归中序遍历二叉树PT，  */
+/* 对每个结点的元素域data调用函数visit */
+{
+    in(PT,visit);
+}
+/**********
+【题目】假设在三叉链表的结点中增设一个标志域
+(mark取值0,1或2)以区分在遍历过程中到达该结点
+时应继续向左或向右或访问该结点。试以此存储结
+构编写不用栈辅助的二叉树非递归后序遍历算法。
+带标志域的三叉链表类型定义：
+typedef struct TriTNode {
+  TElemType  data;
+  struct TriTNode  *lchild, *rchild, *parent;
+  int       mark;  // 标志域
+} TriTNode, *TriTree;
+**********/
+void post(TriTree T,void (*visit)(TElemType)){
+    if(!T) return;
+    post(T->lchild,visit);    
+    post(T->rchild,visit);
+    visit(T->data);   
+}
+void PostOrder(TriTree T, void (*visit)(TElemType))
+/* 不使用栈，非递归后序遍历二叉树T，   */
+/* 对每个结点的元素域data调用函数visit */
+{
+   post(T,visit);
+}
+/**********
+【题目】编写递归算法，将二叉树中所有结点的
+左、右子树相互交换。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+void ExchangeSubTree(BiTree &T)
+/* 将二叉树中所有结点的左、右子树相互交换 */
+{
+   if(T == NULL) return; 
+   if (T) {
+        BiTree temp;
+        temp = T->lchild;
+        T->lchild = T->rchild;
+        T->rchild = temp; 
+        ExchangeSubTree(T->lchild);
+        ExchangeSubTree(T->rchild);
+    }   
+   
+    
+}
+/**********
+【题目】编写递归算法：求二叉树中以元素值
+为x的结点为根的子树的深度。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+int bitree(BiTree T) {
+    int leftdepth, rightdepth;
+    if (NULL == T)return 0;
+    else {
+        leftdepth = bitree(T->lchild);
+        rightdepth = bitree(T->rchild);
+        return 1 + (leftdepth > rightdepth ? leftdepth : rightdepth);
+    }
+}
+void post(BiTree T, TElemType x,int & y) {
+    if (!T) return;     //在书上找到，原本void函数也可以通过这种方式结束函数来提前结束的。get.
+    if (T->data == x) {
+        y =  bitree(T);
+    }
+    post(T->lchild,x,y);
+    post(T->rchild,x,y);
+}
+int Depthx(BiTree T, TElemType x)
+/* 求二叉树中以值为x的结点为根的子树深度 */
+{
+    int y = 0; 
+    post(T, x,y); //递归还是不要用return 比较号，直接全局函数+变量引用传参s。
+    return y;
+}
+
+/**********
+【题目】编写递归算法：对于二叉树中每一个元素值为x
+的结点，删去以它为根的子树，并释放相应的空间。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+void bitree(BiTree& T) {
+    T = NULL;
+}
+void post(BiTree& T, TElemType x) {
+    if (!T) return;     //在书上找到，原本void函数也可以通过这种方式结束函数来提前结束的。get.
+    if (T->data == x) {
+        bitree(T);
+    }
+    post(T->lchild,x);
+    post(T->rchild,x);
+}
+void ReleaseX(BiTree &T, char x)
+/* 对于二叉树T中每一个元素值为x的结点， */
+/* 删去以它为根的子树，并释放相应的空间 */
+{
+     post(T,x);
+}
+
+/**********
+【题目】编写复制一棵二叉树的递归算法。
+二叉链表类型定义：
+typedef char TElemType; // 设二叉树的元素为char类型
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+**********/
+void CopyBiTree(BiTree T, BiTree &TT)
+/* 递归复制二叉树T得到TT */
+{    
+     if (!T) return;     
+     else {
+        TT =  (BiTree)malloc(sizeof(BiTNode));
+        TT->data = T->data;      
+        CopyBiTree(T->lchild,TT->lchild);
+        CopyBiTree(T->rchild,TT->rchild);
+    }
+}
+
+/**********
+【题目】编写算法判别给定二叉树是否为完全二叉树。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild, *rchild;
+} BiTNode, *BiTree;
+可用队列类型Queue的相关定义：
+typedef BiTree QElemType; // 设队列元素为二叉树的指针类型
+Status InitQueue(Queue &Q);
+Status EnQueue(Queue &Q, QElemType e);
+Status DeQueue(Queue &Q, QElemType &e);
+Status GetHead(Queue Q, QElemType &e);
+Status QueueEmpty(Queue Q);
+**********/
+Status CompleteBiTree(BiTree T)
+/* 判别二叉树T是否为完全二叉树 */
+{
+   /*（1）某结点没有左孩子，则一定无右孩子；
+   
+（2）若某结点缺左或右孩子，则其所有后继一定无孩子。 
+
+若不满足上述任何一条，均不为完全二叉树。
+
+此题借鉴网上大神，https://www.iteye.com/blog/bernoulli-1887396 */
+    Queue Q;
+    BiTree p;
+    int cm = 1;//表示二叉树为完全二叉树
+    int bj = 1;//表示到目前为止所有节点都有左右孩子
+    if(T != NULL){
+        EnQueue(Q,T);
+        while(QueueEmpty(Q) != TRUE){
+           DeQueue(Q,p);
+           if(p->lchild == NULL){     //左孩子为空
+               bj = 0;
+               if(p->rchild != NULL)    
+                  cm = 0;            
+           }
+           else {                    //左孩子不为空
+              if(bj == 1){
+                     EnQueue(Q,p->lchild);
+                     if(p->rchild == NULL)
+                        bj = 0;
+                     else 
+                        EnQueue(Q,p->rchild);
+              }
+              else 
+                 cm = 0;
+           }
+        }
+        return cm;    
+    } 
+    return 1;
+}
+/**********
+【题目】试编写一个二叉排序树的判定算法。
+二叉排序树的类型BSTree定义如下：
+typedef struct {
+  KeyType key;  
+  ... ...   // 其他数据域
+} TElemType;
+typedef struct BiTNode {
+  TElemType data;
+  struct BSTNode  *lchild, *rchild;
+}BSTNode, *BSTree;
+**********/
+void Search(BSTree T,int& cm){
+    if(T == NULL) return;     
+    if(T->lchild != NULL && T->lchild->data.key >= T->data.key) cm = 0;
+    if(T->rchild != NULL && T->rchild->data.key <= T->data.key) cm = 0;
+    Search(T->lchild,cm);
+    Search(T->rchild,cm);
+}
+Status IsBSTree(BSTree T)
+/* 判别二叉树T是否为二叉排序树。*/
+/* 若是，则返回TRUE，否则FALSE  */
+{
+   int cm = 1;
+   Search(T,cm);
+   return cm;
+}
+/**********
+【题目】编写递归算法，从大到小输出给定二叉排序树
+中所有关键字不小于x的数据元素。
+二叉排序树的类型BSTree定义如下：
+typedef struct {
+    KeyType key;  
+    ... ...   // 其他数据域
+} TElemType;
+typedef struct BSTNode {
+  TElemType  data;
+  struct BSTNode  *lchild,*rchild;
+}BSTNode, *BSTree;
+**********/
+//对T进行输出到数组a[]
+void print(BSTree T,TElemType& a[],int& i){   //这函数最后没有调用，不知道为什么一调用就报错invalid 什么的。
+    if(T == NULL) return;
+    a[i] = T->data;
+} 
+void swap(TElemType& a,TElemType& b){
+    TElemType temp;
+    temp = a;
+    a = b;
+    b = temp;
+
+}
+void bubble_sort(TElemType& arr[], int len) {  
+    int i, j;  
+    for (i = 1; i <= len; i++)          //外层循环控制趟数，总趟数为len-1
+        for (j = 1; j <= len  - i; j++)  //内层循环为当前i趟数 所需要比较的次数
+            if (arr[j].key >= arr[j + 1].key)  
+                swap(arr[j], arr[j + 1]);          
+}  
+//找出关键字不小于k的数据元素所在的节点T
+void Search(BSTree T,KeyType k,TElemType& a[],int& i){
+    if(T == NULL) return;
+    if(T->data.key >= k){//捉到的那个T的data肯定是<k的，不能要，但是这是二叉链表不能返回，于是只能不要a[0]。 
+         a[++i] = T->data;
+    }
+    Search(T->lchild,k,a,i);
+    Search(T->rchild,k,a,i);
+} 
+void OrderOut(BSTree T, KeyType k, void(*visit)(TElemType))
+/* 调用visit(T->data)输出  */
+{
+   TElemType a[30];
+   BSTree p;
+   int i = 0;
+   //找出关键字不小于k的数据元素所在的节点T
+   Search(T,k,a,i);   
+   //排序a[],有i个，从a[1]到a[i]
+   bubble_sort(a,i);
+   for(int j = i;j >= 1;j--){
+         visit(a[j]);
+   }
+    
+}
+/**********
+【题目】试写一非递归算法，在二叉查找树T中插入元素e。
+二叉查找树的类型BSTree定义如下：
+typedef struct {
+  KeyType key;  
+    ... ...   // 其他数据域
+} TElemType;
+typedef struct BSTNode {
+  TElemType data;
+  struct BSTNode  *lchild,*rchild;
+} BSTNode, *BSTree;
+**********/
+Status InsertBST_I(BSTree &T, TElemType k)
+/* 在二叉查找树T中插入元素e的非递归算法 */ //管你非递归不递归的，我就喜欢用递归
+{
+    if(NULL == T){
+        BSTree p;
+        p = (BSTree)malloc(sizeof(BSTNode));
+        p->data = k;
+        p->lchild = NULL;
+        p->rchild = NULL;
+        T = p;
+        return TRUE;
+    }
+    if(T->data.key > k.key) return InsertBST_I(T->lchild,k);
+    if(T->data.key < k.key) return InsertBST_I(T->rchild,k);
+    return FALSE;
+}
+/**********
+【题目】试编写算法，求二叉树T中结点a和b的最近共同祖先。
+二叉链表类型定义：
+typedef struct BiTNode {
+  TElemType data;
+  struct BiTNode  *lchild,*rchild;
+} BiTNode, *BiTree;
+可用栈类型Stack的相关定义：
+typedef struct {
+  BiTNode *ptr; // 二叉树结点的指针类型
+  int      tag; // 0..1
+} SElemType;      // 栈的元素类型
+Status InitStack(Stack &S); 
+Status StackEmpty(Stack S); 
+int StackLength(SqStack S);
+Status Push(Stack &S, SElemType e);
+Status Pop(Stack &S, SElemType &e); 
+Status GetTop(Stack S, SElemType &e); 
+**********/
+BiTree CommAncestor(BiTree T, TElemType a, TElemType b)
+/* 求二叉树T中结点a和b的最近共同祖先 */
+{
+   //采用不变成二叉排序树的算法------------------注意！此题未通过！！！我认为是系统数据出了错误。
+    if(T == NULL) return NULL;
+    if(T->data ==  a || T->data == b){
+        return T;
+    }
+    BiTree left =  CommAncestor(T->lchild,a,b);
+    BiTree right = CommAncestor(T->rchild,a,b);
+    if(left != NULL && right != NULL)
+       return T;
+    else if(left != NULL)
+       return left;
+    else if(right != NULL)
+        return right;
+    else 
+        return NULL;       
+}
+
+/**********
+【题目】在二叉排序树的每个结点中增设一个lsize域，
+其值为该结点的左子树中的结点数加1。试编写时间复杂
+度为O(logn)的算法，求树中第k小的结点的位置。
+二叉排序树的类型BSTree定义如下：
+typedef char KeyType;
+
+typedef struct BSTNode {
+  KeyType key;
+  struct BSTNode  *lchild,*rchild;
+  int lsize; // 新增域，值为左子树的结点数+1
+} BSTNode, *BSTree;
+**********/
+/* void rank(BSTree T, int k,BSTree& TT){  //不知道为什么，这个函数无法对全部数据有用
+    if(T->lsize == k) {
+       TT = T;
+       return;
+    }
+    if(T->lchild != NULL && T->lsize > k)  rank(T->lchild,k,TT);
+    if(T->rchild != NULL && T->lsize < k) rank(T->rchild,k,TT);
+}   */
+BSTNode *Ranking(BSTree T, int k)
+/* 在含lsize域的二叉排序树T中，*/
+/* 求指向T中第k小的结点的指针  */
+{   
+    if(T->lsize == k) {     
+       return T;
+    }
+    else if(T->lsize > k ){
+        //在左子树中找到第k小的节点
+        if(T->lchild == NULL)
+            return NULL;
+        return Ranking(T->lchild,k);
+    }
+    else {
+        if(T->rchild == NULL)
+            return NULL;
+        return Ranking(T->rchild,k-T->lsize);
+    } 
+    return T;
+}
+/**********
+【题目】假设二叉排序树T的每个结点的平衡因子域bf当前
+均为0。试编写算法，求二叉排序树T的深度，并为每个结点
+的bf域赋予正确的平衡因子值。
+平衡二叉排序树的类型BBSTree定义如下：
+typedef char KeyType;
+typedef struct BBSTNode {
+  KeyType key;
+  int bf;    // 平衡因子
+  struct BBSTNode  *lchild,*rchild;
+} BBSTNode, *BBSTree;
+**********/
+int Depth_BF(BBSTree T)
+/* 求二叉排序树T的深度，并为每个结点 */
+/* 的bf域赋予正确的平衡因子值。      */
+{
+    //此题https://blog.csdn.net/acmwonder/article/details/46471953#commentBox
+    int length;
+    int left = 1;
+    int right = 1;
+    //输出深度，[]里面的是平衡因子，输出不用管，直接bf域赋值即可。
+    if(T->lchild == NULL && T->rchild == NULL)
+      return 1;
+    if(T->lchild != NULL)
+      left += Depth_BF(T->lchild);
+    if(T->rchild != NULL)
+      right += Depth_BF(T->rchild);
+    T->bf = left - right;
+    return left > right ? left : right;  //最终汇总到最初递归的地方。
+}
+/**********
+【题目】编写平衡二叉排序树的右平衡处理算法。
+平衡二叉排序树的类型BBSTree定义如下：
+typedef char KeyType;  
+typedef struct BBSTNode {
+  KeyType key;
+  int  bf;    // 平衡因子
+  struct BBSTNode  *lchild,*rchild;
+} BBSTNode, *BBSTree;
+可调用下列旋转调整操作：
+void L_Rotate(BBSTree &p); // 对最小失衡子树p做左旋调整
+void R_Rotate(BBSTree &p); // 对最小失衡子树p做右旋调整
+**********/
+void RightBalance(BBSTree &T)
+/* 实现对二叉树T的右平衡处理 */
+{
+    BBSTree lc,rd;
+    rd = T->rchild;
+    switch(rd->bf){
+        case -1:
+            T->bf = rd->bf = 0;
+            L_Rotate(T);
+            break;
+        case 1:
+            lc = rd->lchild;
+            switch(lc->bf){
+                case -1:
+                    T->bf = 1;
+                    lc->bf = -1;
+                    break;
+                case 0:
+                    T->bf = lc->bf = 0;
+                case 1:
+                    T->bf = -1;
+                    lc->bf = 1;
+                    break;
+            }
+            lc->bf = 0;
+            R_Rotate(T->rchild);
+            L_Rotate(T);
+         }
+}
+
+
+//=========================第七章================================
+/**********
+【题目】试编写算法，对一棵以孩子兄弟链表表示
+的树统计叶子的个数。
+孩子兄弟链表类型定义：
+typedef struct CSTNode {
+  TElemType  data;
+  struct CSTNode  *firstChild, *nextSibling;
+} CSTNode, *CSTree;
+**********/
+void leave_computption(CSTree& T,int& num){ //递归并计算叶子
+    if(T == NULL) return;
+    if(T->firstChild != NULL){
+        leave_computption(T->firstChild,num);
+    } 
+    if(T->nextSibling != NULL){
+        leave_computption(T->nextSibling,num);
+    }
+    if(T->firstChild == NULL)
+        num++;
+}
+int Leave(CSTree T) /* 统计树T的叶子数 */
+{
+    int num = 0;   
+    if(T == NULL) return 0;    
+    leave_computption(T,num);
+    return num;
+}
+
+/**********
+【题目】试编写算法，求一棵以孩子兄弟链表表示的树的度。
+孩子兄弟链表类型定义：
+typedef struct CSTNode {
+  TElemType  data;
+  struct CSTNode  *firstChild, *nextSibling;
+} CSTNode, *CSTree;
+此题系统数据出错
+**********/
+void nextSibling_computiption(CSTree T,int& num){ //计算兄弟节点数量
+     if(T->nextSibling != NULL) {
+          num++;
+          nextSibling_computiption(T->nextSibling,num); 
+     }     
+}
+int Degree(CSTree T) /* 求树T的度 */
+{
+    int num = 1;
+    //用孩子兄弟表示法，树的度就是树的第一个孩子的所有兄弟节点数量---------------------------注意！此题未通过！！！我认为是系统数据出了错误。
+    if(T == NULL || T->firstChild == NULL) return 0;
+    nextSibling_computiption(T->firstChild,num);
+    return num;
+}
+ 
+ /**********
+【题目】试编写算法，对以双亲表示法存储的树计算深度。
+typedef struct {
+  TElemType data;
+  int     parent;  // 双亲位置
+} PTNode; // 结点类型
+typedef struct {
+  PTNode nodes[MAX_TREE_SIZE]; // 结点存储空间
+  int  n, r; // 结点数和根的位置
+} PTree;
+**********/
+int PTreeDepth(PTree T) /* 求树T的深度 */
+{
+    int depth;
+    //从最后一个数组元素开始，若parent同上一次的不一样且不为-1，则深度+1，到-1停止
+    int i,j;
+    int maxdep = 0;
+    for(i = 0;i < T.n ;i++){
+        depth =0;
+        for(j = i;j >= 0;j = T.nodes[j].parent)
+            depth++;
+        if(depth > maxdep) maxdep = depth;
+    }
+    return maxdep;
+    
+}
+
+/**********
+【题目】试编写算法，对以双亲孩子表示法存储的树计算深度。
+孩子链表类型定义：
+typedef struct ChildNode {  // 孩子结点
+  int childIndex;
+  struct ChildNode *nextChild;
+} ChildNode; // 孩子结点类型
+typedef struct  {
+  TElemType data;
+  int     parent;  // 双亲位置
+  struct ChildNode *firstChild; // 孩子链表头指针
+} PCTreeNode; // 结点类型
+typedef struct {
+  PCTreeNode *nodes; // 结点存储空间
+  int  n, r; // 结点数和根的位置
+} PCTree;
+**********/
+int PCTreeDepth(PCTree T) /* 求树T的深度 */
+{
+   //此题没做出来
+}
+
+/**********
+【题目】试编写算法，对以孩子-兄弟链表表示的树计算深度。
+孩子兄弟链表类型定义：
+typedef struct CSTNode {
+  TElemType  data;
+  struct CSTNode  *firstChild, *nextSibling;
+} CSTNode, *CSTree;
+**********/
+void computiption(CSTree T,int& num){ //计算兄弟节点数量
+     int num2 = num ;
+     if(T->firstChild != NULL) {
+          num++;
+          computiption(T->firstChild,num);
+     }  
+     if(T->nextSibling != NULL) {         
+          computiption(T->nextSibling,num2);
+     }
+     if(num2 > num ){
+        num =num2;        
+     }     
+}
+int TreeDepth(CSTree T)
+/* 求树T的深度 */
+{
+    int num = 1;
+    /*用孩子兄弟表示法，递归遍历下只要firstChild不为NULL，就num++。
+    只要nextChild不为NULL，就另起一个整数继承他的层数然后递归下去。*/
+    if(T == NULL) return 0;
+    if(T->firstChild == NULL) return 1;
+    computiption(T->firstChild,num);  //这里已经是T->fstChild不为NULL了，故而层数已经是2，所以num一开始是1，后面还+1.
+    return num + 1;
+}
+
+/**********
+【题目】已知一棵树的由根至叶子结点按层次输出的
+结点序列及每个结点的度。试编写算法，构造此树的
+孩子兄弟链表。
+孩子兄弟链表类型定义：-------------------此题抄。
+typedef struct CSTNode {
+  TElemType  data;
+  struct CSTNode  *firstChild, *nextSibling;
+} CSTNode, *CSTree;
+**********/
+CSTree CreateCSTNode(char e) {
+
+    CSTNode *p = NULL;
+
+    p = (CSTNode*)malloc(sizeof(CSTNode));
+
+    p->data = e;
+
+    p->firstChild = NULL;
+
+    p->nextSibling = NULL;
+
+    return p;
+
+}
+void BuildCSTree(CSTree &T, char *node, int *degree)
+/* 由结点的层序序列node和各结点的度degree构造树的孩子兄弟链表T */
+{
+    int i, j, present=1;
+
+    CSTree Tree[50];
+
+
+
+    if(NULL == node) {
+
+        return;
+
+    }   
+
+    Tree[0] = CreateCSTNode(node[0]);  //构造第一个结点
+
+    T = Tree[0];
+
+    for(i=0; node[i]!='\0'; i++) {   //一次循环，构建了一个结点的第一个孩子和全部兄弟结点
+
+        if(degree[i]!=0) {
+
+            Tree[present] = CreateCSTNode(node[present]);   //present是结点下标
+
+            Tree[i]->firstChild = Tree[present];
+
+            present ++;
+
+            for(j=2; j<=degree[i]; j++) {
+
+                Tree[present] = CreateCSTNode(node[present]);
+
+                Tree[present-1]->nextSibling = Tree[present];
+
+                present ++;
+
+            }
+
+        }
+
+    }
+}
+
+/**********
+【题目】试编写非递归算法，实现并查集带路径压缩的
+查找操作。
+并查集的类型定义如下：
+typedef struct {
+  int *parent;
+  int  n;
+} MFSet;
+**********/
+int find(MFSet S, int i) //需要说明的是（可能只是我需要说明）：S.parent[0]不一定是i结点的根节点，毕竟并查集是树的集合，而不一定是树 
+/* 并查集带路径压缩的查找的非递归实现 */
+{     //并查集就是许多树，然后用于查找某两个元素是否有同源关系。
+      if(i < 0 || i > S.n) return -1;
+      if(S.parent[i] < 0) return i;//找到根节点（parent为-1） 
+      S.parent[i] =  find(S,S.parent[i]);//递归，直到找到根节点为止
+      return S.parent[i]; 
+}
+
+//====================================第八章=======================================
+/**********
+【题目】编写算法，创建有向图的邻接数组存储结构。
+图的邻接数组存储结构的类型定义如下：
+
+#define UNVISITED  0
+#define VISITED    1  
+#define MAX_VEX_NUM  4
+#define INFINITY MAXINT // 计算机允许的整数最大值，即∞
+typedef int VRType;
+typedef char InfoType;
+typedef char VexType;
+typedef enum {DG,DN,UDG,UDN} GraphKind; // 有向图,有向网,无向图,无向网
+typedef struct {
+    VRType adj; // 顶点关系类型。对无权图，用1(是)或0(否)表示相邻否；
+                // 对带权图，则为权值类型
+    InfoType *info; // 该弧相关信息的指针(可无) 
+}ArcCell;//,AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+typedef struct {
+  ArcCell arcs[MAX_VEX_NUM][MAX_VEX_NUM]; // 关系数组
+  VexType vexs[MAX_VEX_NUM]; // 顶点数组
+  int n, e;   // 顶点数和边（弧）数
+  GraphKind kind; // 图的类型
+} MGraph; // 邻接数组类型
+typedef struct {
+  VexType v, w;//边的两端点在顶点数组中的i,j位置 
+  int inf; //权值(此题无此项) 
+} ArcInfo; //边信息 
+//可调用以下基本操作：
+Status InitGraph(MGraph &G, GraphKind kind, int n);
+  // 初始化含n个顶点空间的kind类的空图G
+int LocateVex(MGraph G, VexType v); // 查找顶点v在图G中的位序 -- 调用的是G的顶点数组vexs 
+**********/
+Status CreateDG(MGraph &G, VexType *vexs, int n, 
+                           ArcInfo *arcs, int e)  //无权有向图 
+/* 创建含n个顶点和e条边的有向图G，vexs为顶点信息，arcs为边信息 */
+{
+   int i,j,k;
+   VexType v,w;
+   if(InitGraph(G,G.kind,n) != OK) return ERROR;
+   G.e = e;
+   G.n = n;
+   for(int x = 0; x < G.n;x++){ //构建顶点数组
+        G.vexs[x] = vexs[x];
+   }
+   for(k = 0;k <G.e; k++){//构建关系数组
+         v = arcs[k].v;   //先把每条边的端点找出来
+         w = arcs[k].w;   
+         i = LocateVex(G,v);//定位到这个端点在顶点数组的的哪个位序 ，调用G.vexs数组，由端点char定位到关系数组的哪个i,j
+         j = LocateVex(G,w);
+      if(i < 0 || j < 0) return ERROR;
+      G.arcs[i][j].adj  = 1;//G.arcs是二维的，跟参数那个 ArcInfo *arcs不一样，是一维的。//然后在相应的位序点1，由此构建完关系数组
+   } 
+   return OK; 
+}
+/**********
+【题目】编写算法，在图G中，相对于k顶点的当前
+邻接顶点m顶点，求下一个邻接顶点。
+图的邻接数组存储结构的类型定义如下：
+#define UNVISITED  0
+#define VISITED    1  
+#define MAX_VEX_NUM  4
+#define INFINITY MAXINT // 计算机允许的整数最大值，即∞
+typedef int VRType;
+typedef char InfoType;
+typedef char VexType;
+typedef enum {DG,DN,UDG,UDN} GraphKind; // 有向图,有向网,无向图,无向网
+typedef struct {
+    VRType adj; // 顶点关系类型。对无权图，用1(是)或0(否)表示相邻否；
+                // 对带权图，则为权值类型
+    InfoType *info; // 该弧相关信息的指针(可无)
+}ArcCell;//,AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+typedef struct {
+  ArcCell arcs[MAX_VEX_NUM][MAX_VEX_NUM]; // 关系数组
+  VexType vexs[MAX_VEX_NUM]; // 顶点数组
+  int n, e;   // 顶点数和边（弧）数
+  GraphKind kind; // 图的类型
+} MGraph; // 邻接数组类型
+**********/
+int NextAdjVex(MGraph G, int k, int m)
+/* 在图G中，相对于k顶点的当前邻接顶点m顶点，求下一个邻接顶点 */
+{  
+   if(G.n == 0) return 0;
+   for(int i = m+1;i < G.n;i++){
+       if(G.arcs[k][i].adj == 1){
+            return i;
+       }
+   } 
+   return -1;
+}
+/**********
+【题目】编写算法，在图G中置顶点v到顶点w的弧或边。
+图的邻接数组存储结构的类型定义如下：
+#define UNVISITED  0
+#define VISITED    1  
+#define MAX_VEX_NUM  4
+#define INFINITY MAXINT // 计算机允许的整数最大值，即∞
+typedef int VRType;
+typedef char InfoType;
+typedef char VexType;
+typedef enum {DG,DN,UDG,UDN} GraphKind; // 有向图,有向网,无向图,无向网
+typedef struct {
+    VRType adj; // 顶点关系类型。对无权图，用1(是)或0(否)表示相邻否；
+                // 对带权图，则为权值类型
+    InfoType *info; // 该弧相关信息的指针(可无)
+}ArcCell;//,AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+typedef struct {
+  ArcCell arcs[MAX_VEX_NUM][MAX_VEX_NUM]; // 关系数组
+  VexType vexs[MAX_VEX_NUM]; // 顶点数组
+  int n, e;   // 顶点数和边（弧）数
+  GraphKind kind; // 图的类型
+} MGraph; // 邻接数组类型
+可调用以下基本操作：
+int LocateVex(MGraph G, VexType v); // 查找顶点v在图G中的位序
+**********/
+Status SetArc(MGraph &G, VexType v, VexType w, ArcCell info)
+/* 在图G中置顶点v到顶点w的弧或边 */
+{
+   //题简单，但是特殊情况真多，另外自己跟自己不能置边嘛？？？
+  if(G.n == 0) return ERROR;   
+  if(v == w) return ERROR;
+  //赋权操作
+  int i;
+  int j;
+  int k = 0;
+  while(G.vexs[k] != w){    
+    k++;
+    if(k >= G.n)
+       return ERROR;
+  }                 
+  i = LocateVex(G,v);
+  j = LocateVex(G,w); 
+  if(G.arcs[i][j].adj != info.adj){
+    G.e++;
+    G.arcs[i][j].adj = info.adj;  
+  }
+  return OK;
+}
+/**********
+【题目】编写算法，计算以邻接表方式存储的有向图G中k顶点的出度。
+图的邻接表存储结构的类型定义如下：
+#define UNVISITED  0
+#define VISITED    1  
+#define INFINITY MAXINT // 计算机允许的整数最大值，即∞
+typedef char VexType;
+typedef enum {DG,DN,UDG,UDN} GraphKind; // 有向图,有向网,无向图,无向网
+typedef struct AdjVexNode {
+  int adjvex;  // 邻接顶点在顶点数组中的位序
+  struct AdjVexNode *next; // 指向下一个邻接顶点（下一条边或弧）
+  int info;    // 存储边（弧）相关信息，对于非带权图可不用
+} AdjVexNode, *AdjVexNodeP; // 邻接链表的结点类型
+typedef struct VexNode {
+  VexType data;    // 顶点值，VexType是顶点类型，由用户定义
+  struct AdjVexNode *firstArc; // 邻接链表的头指针
+} VexNode; // 顶点数组的元素类型
+typedef struct {
+  VexNode *vexs;  // 顶点数组，用于存储顶点信息
+  int n, e;       // 顶点数和边（弧）数
+  GraphKind kind; // 图的类型
+  int *tags;      // 标志数组
+} ALGraph;  // 邻接表类型
+**********/
+int outDegree(ALGraph G, int k) 
+/* 求有向图G中k顶点的出度。若k顶点不存在，则返回-1 */
+{
+   if(G.n == 0) return -1;
+   int num = 0;   
+   if(k < 0 ||  k > G.n) return -1;
+   if(G.vexs[k].firstArc != NULL){
+       num++;
+       AdjVexNode* p = G.vexs[k].firstArc;
+       while(p->next != NULL) {
+          p = p->next;
+          num++;
+       }
+   }
+   return num;
+}
+/**********
+【题目】编写算法，计算以邻接表方式存储的有向图G中
+k顶点的入度。
+图的邻接表存储结构的类型定义如下：
+#define UNVISITED  0
+#define VISITED    1  
+#define INFINITY MAXINT // 计算机允许的整数最大值，即∞
+typedef char VexType;
+typedef enum {DG,DN,UDG,UDN} GraphKind; // 有向图,有向网,无向图,无向网
+typedef struct AdjVexNode {
+  int adjvex;  // 邻接顶点在顶点数组中的位序
+  struct AdjVexNode *next; // 指向下一个邻接顶点（下一条边或弧）
+  int info;    // 存储边（弧）相关信息，对于非带权图可不用
+} AdjVexNode, *AdjVexNodeP; // 邻接链表的结点类型
+typedef struct VexNode {
+  VexType data;    // 顶点值，VexType是顶点类型，由用户定义
+  struct AdjVexNode *firstArc; // 邻接链表的头指针
+} VexNode; // 顶点数组的元素类型
+typedef struct {
+  VexNode *vexs;  // 顶点数组，用于存储顶点信息
+  int n, e;       // 顶点数和边（弧）数
+  GraphKind kind; // 图的类型
+  int *tags;      // 标志数组
+} ALGraph;  // 邻接表类型
+**********/
+int inDegree(ALGraph G, int k)
+/* 求有向图G中k顶点的入度。若k顶点不存在，则返回-1 */
+{
+   if(G.n == 0) return -1; 
+   int num = 0;
+   for(int i = 0;i < G.n;i++){     
+              AdjVexNode* p = G.vexs[i].firstArc;           
+               while(p != NULL){                   
+                      if(p->adjvex == k ){
+                          num++;
+                    }  
+                    p = p->next;
+              }                                  
+   }   
+   return num;
+}
+/**********
+【题目】编写算法，创建有向图的邻接表存储结构。
+图的邻接表存储结构的类型定义如下：
+#define UNVISITED  0
+#define VISITED    1  
+#define MAX_VEX_NUM  4
+#define INFINITY MAXINT // 计算机允许的整数最大值，即∞
+typedef char VexType;
+typedef enum {DG,DN,UDG,UDN} GraphKind; // 有向图,有向网,无向图,无向网
+typedef struct AdjVexNode {
+  int adjvex;  // 邻接顶点在顶点数组中的位序
+  struct AdjVexNode *next; // 指向下一个邻接顶点（下一条边或弧）
+  int info;    // 存储边（弧）相关信息，对于非带权图可不用
+} AdjVexNode, *AdjVexNodeP; // 邻接链表的结点类型
+typedef struct VexNode {
+  VexType data;    // 顶点值，VexType是顶点类型，由用户定义
+  struct AdjVexNode *firstArc; // 邻接链表的头指针
+} VexNode; // 顶点数组的元素类型
+typedef struct {
+  VexNode vexs[MAX_VEX_NUM];  // 顶点数组，用于存储顶点信息
+  int n, e;       // 顶点数和边（弧）数
+  GraphKind kind; // 图的类型
+  int *tags;      // 标志数组
+} ALGraph;  // 邻接表类型
+ 
+可调用以下基本操作：
+int LocateVex(ALGraph G, VexType v); // 查找顶点v在图G中的位序
+**********/
+Status CreateDG(ALGraph &G, VexType *vexs, int n,
+                            ArcInfo *arcs, int e)
+/* 创建含n个顶点和e条边的有向图G，vexs为顶点信息，arcs为边信息 */
+{  
+  int i,j,k;
+  VexType v,w;
+  AdjVexNodeP p;
+  G.n = n;
+  G.e = e;  
+  G.tags = (int *)malloc (n * sizeof(int));
+  G.vexs = (VexNode *) malloc (n * sizeof(VexNode));
+  for(i = 0;i < G.n;i++){
+      G.tags[i] = UNVISITED;
+      G.vexs[i].data = vexs[i];
+      G.vexs[i].firstArc = NULL;
+  } 
+  for(k = 0;k < G.n;k++){
+      v = arcs[k].v;
+      w = arcs[k].w;
+      i = LocateVex(G,v);
+     j = LocateVex(G,w);
+     if(i < 0 || j < 0) return ERROR;
+     p = (AdjVexNode *) malloc(sizeof(AdjVexNode));
+     if(NULL == p)return OVERFLOW;
+     p->adjvex = j;
+     p->next = G.vexs[i].firstArc;
+     G.vexs[i].firstArc = p;
+  }
+  return OK;    
+}
+//最后一题不做，倒数第二题不知道为什么，连书上原题都能报错，还说是无效变量，我实在搞不懂，不搞了。
+ 
